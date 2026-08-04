@@ -187,7 +187,7 @@ conferir('carga inicial reconcilia os itens', inicial.itens, [
 conferir('carga inicial produz 3 avisos', inicial.avisos.length, 3);
 conferir('avisos recebem id estavel', inicial.avisos.map((x) => x.id), ['aviso-0', 'aviso-1', 'aviso-2']);
 globalThis.localStorage = armazenamentoFalso({ 'compia:carrinho:v1:cli-001': 'nao e json' });
-conferir('storage corrompido: estado vazio, sem aviso', ctx.criarEstadoInicial('cli-001'), { clienteId: 'cli-001', itens: [], avisos: [] });
+conferir('storage corrompido: estado vazio, sem aviso', ctx.criarEstadoInicial('cli-001'), { clienteId: 'cli-001', itens: [], avisos: [], sequenciaDeAvisos: 0 });
 delete globalThis.localStorage;
 
 /* ================= 11. carrinho por cliente ================= */
@@ -230,6 +230,22 @@ conferir('troca os itens', trocado.itens, carrinhoB);
 conferir('descarta avisos do anterior', trocado.avisos, []);
 conferir('nao muta o estado anterior', estadoDeUm.clienteId, 'cli-001');
 conferir('demais acoes preservam o dono', ctx.reducerCarrinho(estadoDeUm, { tipo: 'limpar' }).clienteId, 'cli-001');
+
+/* ================= 14. canal de aviso (checkout abortado) ================= */
+secao('reducer avisar');
+const semAvisos = { clienteId: 'cli-001', itens: [], avisos: [], sequenciaDeAvisos: 0 };
+const comUmAviso = ctx.reducerCarrinho(semAvisos, { tipo: 'avisar', texto: 'primeiro' });
+conferir('avisar empilha o texto', comUmAviso.avisos, [{ id: 'aviso-0', texto: 'primeiro' }]);
+conferir('avisar avanca a sequencia', comUmAviso.sequenciaDeAvisos, 1);
+const comDoisAvisos = ctx.reducerCarrinho(comUmAviso, { tipo: 'avisar', texto: 'segundo' });
+conferir('ids nao se repetem', comDoisAvisos.avisos.map((a) => a.id), ['aviso-0', 'aviso-1']);
+/* Descartar e avisar de novo não pode reciclar id: o React usaria a mesma
+   chave para conteúdos diferentes. */
+const apos = ctx.reducerCarrinho(comDoisAvisos, { tipo: 'descartarAviso', id: 'aviso-0' });
+conferir('id nao e reciclado apos descarte', ctx.reducerCarrinho(apos, { tipo: 'avisar', texto: 'terceiro' }).avisos.map((a) => a.id), ['aviso-1', 'aviso-2']);
+conferir('avisar preserva os itens', ctx.reducerCarrinho({ ...semAvisos, itens: carrinhoA }, { tipo: 'avisar', texto: 'x' }).itens, carrinhoA);
+conferir('avisar nao muta o estado anterior', semAvisos.avisos.length, 0);
+conferir('trocarCliente zera a sequencia pelos avisos novos', ctx.reducerCarrinho(comDoisAvisos, { tipo: 'trocarCliente', clienteId: 'cli-002', itens: [], avisos: [{ id: 'aviso-0', texto: 'a' }] }).sequenciaDeAvisos, 1);
 
 console.log('\n' + falhas + ' falha(s)');
 process.exit(falhas === 0 ? 0 : 1);

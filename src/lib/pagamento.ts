@@ -266,6 +266,32 @@ function resumoHex(texto: string): string {
  *   dois chamados iguais → payloads idênticos
  *   totais diferentes    → payloads diferentes
  */
+/**
+ * A cobrança PIX venceu?
+ *
+ * `agora` vem por parâmetro pela mesma razão de `validarValidade`: função
+ * pura, teste determinístico. Só cobrança PIX ainda pendente pode expirar —
+ * uma já paga ou de cartão não.
+ *
+ * Testes de mesa (expiraEm = '2026-02-26T12:00:00Z', como em ped-003):
+ *   agora antes do vencimento      → false
+ *   agora exatamente no vencimento → true   (o minuto do vencimento já venceu)
+ *   agora depois                   → true
+ *   pagamento sem expiraEm         → false
+ *   PIX já aprovado                → false
+ *   cartão                         → false
+ */
+export function cobrancaExpirada(pagamento: Pagamento, agora: string): boolean {
+  if (pagamento.metodo !== 'pix' || pagamento.status !== 'pendente') return false;
+  if (pagamento.expiraEm === undefined) return false;
+
+  const vencimento = new Date(pagamento.expiraEm).getTime();
+  const referencia = new Date(agora).getTime();
+  if (Number.isNaN(vencimento) || Number.isNaN(referencia)) return false;
+
+  return referencia >= vencimento;
+}
+
 export function gerarCobrancaPix(total: number, agora: string): Pagamento {
   const chaveCompacta = chavePixLoja.replace(/-/g, '').toUpperCase();
   const corpo = `00020126FAKE${chaveCompacta}5204000053039865802BR54${total}`;

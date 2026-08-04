@@ -10,6 +10,7 @@ import type {
   StatusPedido,
 } from '../types';
 import { calcularSubtotal } from './carrinho';
+import { gerarCobrancaPix } from './pagamento';
 
 /**
  * Montagem e transição de pedidos. Puro: nenhuma função lê o relógio — a
@@ -200,6 +201,9 @@ const OBSERVACAO: Record<string, string> = {
  * (PIX ainda pendente) atualiza o pagamento sem mexer no status: a cobrança
  * existe, o pedido continua esperando.
  *
+ * `produtos` é obrigatório: sem ele um pedido de e-book seria aprovado e
+ * ficaria sem os arquivos, falhando em silêncio.
+ *
  * Testes de mesa:
  *   aprovado + item físico     → 'pago', histórico +1
  *   aprovado + retirada        → 'pronto_para_retirada'
@@ -213,7 +217,7 @@ export function aplicarPagamento(
   pedido: Pedido,
   pagamento: Pagamento,
   agora: string,
-  produtos: Produto[] = [],
+  produtos: Produto[],
 ): Pedido {
   const aprovado = pagamento.status === 'aprovado';
   const recusado = pagamento.status === 'recusado';
@@ -245,4 +249,52 @@ export function aplicarPagamento(
   }
 
   return atualizado;
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Renovação da cobrança PIX                                        */
+/* ------------------------------------------------------------------ */
+
+/** Como o status do pedido aparece para o cliente. */
+export const ROTULO_DE_STATUS: Record<StatusPedido, string> = {
+  aguardando_pagamento: 'Aguardando pagamento',
+  pago: 'Pago',
+  em_separacao: 'Em separação',
+  enviado: 'Enviado',
+  pronto_para_retirada: 'Pronto para retirada',
+  entregue: 'Entregue',
+  cancelado: 'Cancelado',
+};
+
+/**
+ * Substitui uma cobrança PIX vencida por uma nova, pelo mesmo total, e
+ * registra o evento. O status do pedido não muda: ele continuava e continua
+ * aguardando pagamento — só o meio de pagar foi renovado.
+ *
+ * Não confere se venceu de fato: quem decide é `cobrancaExpirada`, e é a
+ * tela que oferece o botão. Chamar sem necessidade só gera outra cobrança.
+ *
+ * Testes de mesa (ped-003, total 32736, agora = '2026-08-04T12:00:00Z'):
+ *   pagamento.payloadPix   → diferente do anterior
+ *   pagamento.expiraEm     → '2026-08-04T12:30:00.000Z'
+ *   pagamento.status       → 'pendente'
+ *   pagamento.valor        → 32736, o total do pedido
+ *   status do pedido       → segue 'aguardando_pagamento'
+ *   histórico              → ganha um evento com a observação da renovação
+ *   pedido original        → intacto
+ */
+export function renovarCobrancaPix(pedido: Pedido, agora: string): Pedido {
+  return {
+    ...pedido,
+    pagamento: gerarCobrancaPix(pedido.total, agora),
+    historico: [
+      ...pedido.historico,
+      {
+        status: pedido.status,
+        em: agora,
+        observacao: 'Cobrança PIX expirada. Nova cobrança gerada.',
+      },
+    ],
+    atualizadoEm: agora,
+  };
 }

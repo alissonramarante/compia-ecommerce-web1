@@ -24,10 +24,12 @@ const SUITES = [
   ['frete', 'verifica-frete.mjs', 'lib/frete: CEP, faixas, gratuidade'],
   ['pagamento', 'verifica-pagamento.mjs', 'lib/pagamento: Luhn, bandeira, PIX'],
   ['pedido', 'verifica-pedido.mjs', 'lib/pedido + persistência + reducer'],
+  ['checkout', 'verifica-checkout.mjs', 'lib/checkout: passos, validação, PIX vencido'],
   ['catalogo (tela)', 'verifica-render.mjs', 'renderização do catálogo'],
   ['produto (tela)', 'verifica-produto-render.mjs', 'renderização do produto'],
   ['carrinho (tela)', 'verifica-carrinho-render.mjs', 'renderização do carrinho'],
   ['entrar (tela)', 'verifica-entrar-render.mjs', 'renderização da tela de entrar'],
+  ['checkout (tela)', 'verifica-checkout-render.mjs', 'renderização do checkout e do pedido'],
 ];
 
 const detalhado = process.argv.includes('--detalhado');

@@ -27,6 +27,12 @@ export interface EstadoCarrinho {
   clienteId: string;
   itens: ItemCarrinho[];
   avisos: Aviso[];
+  /**
+   * Contador de ids de aviso. Fica no estado porque o reducer é puro e não
+   * pode sortear id nem ler o relógio; o índice do array não serve, porque
+   * avisos são descartados fora de ordem.
+   */
+  sequenciaDeAvisos: number;
 }
 
 export type AcaoCarrinho =
@@ -35,6 +41,7 @@ export type AcaoCarrinho =
   | { tipo: 'alterar'; produto: Produto; quantidade: number }
   | { tipo: 'limpar' }
   | { tipo: 'descartarAviso'; id: string }
+  | { tipo: 'avisar'; texto: string }
   | { tipo: 'trocarCliente'; clienteId: string; itens: ItemCarrinho[]; avisos: Aviso[] };
 
 /**
@@ -78,12 +85,29 @@ export function reducerCarrinho(
         avisos: estado.avisos.filter((aviso) => aviso.id !== acao.id),
       };
 
+    /* Aviso vindo de fora da reconciliação — hoje, o checkout abortado por
+       troca de cliente. Texto já pronto: quem chama redige. */
+    case 'avisar':
+      return {
+        ...estado,
+        avisos: [
+          ...estado.avisos,
+          { id: `aviso-${estado.sequenciaDeAvisos}`, texto: acao.texto },
+        ],
+        sequenciaDeAvisos: estado.sequenciaDeAvisos + 1,
+      };
+
     case 'trocarCliente':
-      return { clienteId: acao.clienteId, itens: acao.itens, avisos: acao.avisos };
+      return {
+        clienteId: acao.clienteId,
+        itens: acao.itens,
+        avisos: acao.avisos,
+        sequenciaDeAvisos: acao.avisos.length,
+      };
   }
 }
 
-/** Avisos nascem só na carga, então o índice serve de id estável. */
+/** Avisos da carga: o índice serve de id, porque nascem todos de uma vez. */
 function comIds(textos: string[]): Aviso[] {
   return textos.map((texto, indice) => ({ id: `aviso-${indice}`, texto }));
 }
@@ -92,7 +116,12 @@ function comIds(textos: string[]): Aviso[] {
 export function criarEstadoInicial(clienteId: string): EstadoCarrinho {
   const { itens, avisos } = carregarReconciliado(produtos, clienteId);
 
-  return { clienteId, itens, avisos: comIds(avisos) };
+  return {
+    clienteId,
+    itens,
+    avisos: comIds(avisos),
+    sequenciaDeAvisos: avisos.length,
+  };
 }
 
 export interface ValorDoCarrinho {
@@ -105,6 +134,8 @@ export interface ValorDoCarrinho {
   alterarQuantidade: (produto: Produto, quantidade: number) => void;
   limpar: () => void;
   descartarAviso: (id: string) => void;
+  /** Empilha um aviso já redigido para aparecer no carrinho. */
+  avisar: (texto: string) => void;
 }
 
 export const CarrinhoContext = createContext<ValorDoCarrinho | null>(null);
@@ -155,6 +186,7 @@ function CarrinhoProvider({ children }: Props) {
         despachar({ tipo: 'alterar', produto, quantidade }),
       limpar: () => despachar({ tipo: 'limpar' }),
       descartarAviso: (id) => despachar({ tipo: 'descartarAviso', id }),
+      avisar: (texto) => despachar({ tipo: 'avisar', texto }),
     }),
     [estado.itens, estado.avisos],
   );

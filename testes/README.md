@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as doze em sequência
+npm run testes              # roda as catorze em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -21,11 +21,13 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-sessao` | `lib/sessao`, `lib/sessaoArmazenada` e o reducer: acesso da equipe, conta inativa, resolução contra os mocks |
 | `verifica-frete` | `lib/frete`: validação de CEP, faixas, arredondamento por quilo, frete grátis não contaminando o expresso |
 | `verifica-pagamento` | `lib/pagamento`: Luhn, bandeiras (Elo antes de Visa), validade com data injetada, parcelas, PIX determinístico, e que nenhum dado sensível sai no `Pagamento` |
+| `verifica-checkout` | `lib/checkout`: quais passos existem, guarda de passo pela URL, validação de endereço e cartão, máscaras, cobrança PIX vencida e renovação |
 | `verifica-pedido` | `lib/pedido`, `lib/pedidosArmazenados` e o reducer: numeração sequencial, congelamento de título e tipo, as quatro transições de `aplicarPagamento` |
 | `verifica-render` | Tela do catálogo: contagens, filtros vindos da URL, estado vazio |
 | `verifica-produto-render` | Tela do produto: ficha CIP, selos, kit, e-book, esgotado, slug inexistente |
 | `verifica-carrinho-render` | Tela do carrinho: tabela, resumo, avisos, contador do cabeçalho |
 | `verifica-entrar-render` | Tela de entrar: seletor de cliente, acesso da equipe, cabeçalho |
+| `verifica-checkout-render` | Telas de checkout e pedido: os quatro passos, guarda por URL, frete grátis, PIX vencido e em aberto, downloads, pedido inexistente |
 
 ## Arquitetura
 
