@@ -52,9 +52,19 @@ src/
   como função pura, testável sem DOM. O hook só liga isso ao React. O projeto
   não tem jsdom e não pode instalar: o que não for testável sem DOM é
   efetivamente não testado.
-- **Teste de renderização** usa `renderToStaticMarkup` + `MemoryRouter`, em
-  suítes fora de `src/`. Testes de mesa das funções puras ficam em comentário
-  no próprio arquivo e são executados contra os mocks reais.
+- **Testes ficam em `testes/`, na raiz do repositório, versionados.** Fora do
+  `include` do `tsconfig.json`, para não entrarem no build nem no `tsc --noEmit`,
+  mas dentro do git. "Fora de `src/`" significa fora do bundle, nunca fora do
+  controle de versão. `npm run testes` roda todas as suítes em sequência e tem
+  que funcionar num clone limpo, sem depender de estado de sessão.
+- **Arnês único:** `testes/arnes.tsx` expõe `renderizarComProvedores(rota, opcoes)`,
+  espelhando a árvore de providers de `App.tsx` e aceitando estado inicial
+  (sessão, carrinhos por cliente, conteúdo bruto corrompido, ausência de
+  `localStorage`, armazenamento hostil). Provider novo entra como uma linha no
+  arnês, não como varredura nas suítes.
+- **Teste de renderização** usa `renderToStaticMarkup` + `MemoryRouter`.
+  Testes de mesa das funções puras ficam em comentário no próprio arquivo e são
+  executados contra os mocks reais.
 - **Nunca hardcodar valor derivado em prosa.** Percentual, soma e economia são
   calculados. Um "18% de desconto" escrito na descrição do mock desatualiza
   sozinho — foi exatamente o que aconteceu com `prod-009`.
@@ -183,7 +193,9 @@ Tela vazia convida: "Seu carrinho está vazio. Ver catálogo."
 ## Como trabalhar comigo (Claude Code)
 
 - Entregue **uma fatia vertical por vez**, na ordem do roadmap. Não adiante fatias.
-- Ao terminar uma fatia: rode `npm run build`, liste os arquivos criados e pare.
+- Ao terminar uma fatia: rode `npm run build` **e** `npm run testes`, liste os
+  arquivos criados e pare. Suíte quebrada é fatia incompleta, ainda que o build
+  passe.
 - Nunca edite `src/types/index.ts` sem avisar qual tipo mudou e por quê.
 - Não instale dependência nova sem perguntar.
 - Não crie backend, API route, nem `fetch` para serviço externo.

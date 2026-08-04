@@ -4,6 +4,9 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# bundles intermediários das suítes
+testes/.cache/
+
 .DS_Store
 Thumbs.db
 
