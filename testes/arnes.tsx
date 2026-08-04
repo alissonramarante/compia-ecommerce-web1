@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import SessaoProvider from '../src/contexts/SessaoContext.tsx';
+import PedidosProvider from '../src/contexts/PedidosContext.tsx';
 import CarrinhoProvider from '../src/contexts/CarrinhoContext.tsx';
 import Layout from '../src/components/Layout.tsx';
 
@@ -31,6 +32,8 @@ interface Opcoes {
   sessao?: { clienteId: string; usuarioId: string | null } | null;
   /** Semeia o carrinho de cada cliente: `{ 'cli-001': [itens] }`. */
   carrinhos?: Record<string, unknown[]>;
+  /** Semeia `compia:pedidos:v1`. Ausente usa a semente dos mocks. */
+  pedidos?: unknown[];
   /** Grava chaves cruas, para testar conteúdo corrompido ou o formato antigo. */
   bruto?: Record<string, string>;
   /** `localStorage` inexistente (SSR). */
@@ -68,6 +71,10 @@ function prepararArmazenamento(opcoes: Opcoes): void {
 
   for (const [clienteId, itens] of Object.entries(opcoes.carrinhos ?? {})) {
     dados[`compia:carrinho:v1:${clienteId}`] = JSON.stringify(itens);
+  }
+
+  if (opcoes.pedidos !== undefined) {
+    dados['compia:pedidos:v1'] = JSON.stringify(opcoes.pedidos);
   }
 
   Object.assign(dados, opcoes.bruto ?? {});
@@ -111,11 +118,13 @@ export function renderizarComProvedores(rota: string, opcoes: Opcoes = {}): stri
 
   return renderToStaticMarkup(
     <SessaoProvider>
-      <CarrinhoProvider>
-        <MemoryRouter initialEntries={[rota]}>
-          <Routes>{rotas}</Routes>
-        </MemoryRouter>
-      </CarrinhoProvider>
+      <PedidosProvider>
+        <CarrinhoProvider>
+          <MemoryRouter initialEntries={[rota]}>
+            <Routes>{rotas}</Routes>
+          </MemoryRouter>
+        </CarrinhoProvider>
+      </PedidosProvider>
     </SessaoProvider>,
   );
 }

@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as nove em sequência
+npm run testes              # roda as doze em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -19,6 +19,9 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-produto` | `lib/produto`: kit, economia, relacionados, quantidade, `AUTOR_COLETIVO` |
 | `verifica-carrinho` | `lib/carrinho`, `lib/carrinhoArmazenado` e o reducer: limites, `localStorage` hostil, reconciliação, carrinho por cliente, migração da chave antiga |
 | `verifica-sessao` | `lib/sessao`, `lib/sessaoArmazenada` e o reducer: acesso da equipe, conta inativa, resolução contra os mocks |
+| `verifica-frete` | `lib/frete`: validação de CEP, faixas, arredondamento por quilo, frete grátis não contaminando o expresso |
+| `verifica-pagamento` | `lib/pagamento`: Luhn, bandeiras (Elo antes de Visa), validade com data injetada, parcelas, PIX determinístico, e que nenhum dado sensível sai no `Pagamento` |
+| `verifica-pedido` | `lib/pedido`, `lib/pedidosArmazenados` e o reducer: numeração sequencial, congelamento de título e tipo, as quatro transições de `aplicarPagamento` |
 | `verifica-render` | Tela do catálogo: contagens, filtros vindos da URL, estado vazio |
 | `verifica-produto-render` | Tela do produto: ficha CIP, selos, kit, e-book, esgotado, slug inexistente |
 | `verifica-carrinho-render` | Tela do carrinho: tabela, resumo, avisos, contador do cabeçalho |
