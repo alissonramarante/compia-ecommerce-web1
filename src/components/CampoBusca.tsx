@@ -1,23 +1,27 @@
 import { Search } from 'lucide-react';
+import { useCampoDebounced } from '../hooks/useCampoDebounced';
+import type { EscritaDeFiltro } from '../lib/campoDebounced';
 
 interface Props {
   /** Termo atual, vindo da URL. */
   valor: string;
-  aoBuscar: (termo: string) => void;
+  aoAplicar: (escrita: EscritaDeFiltro) => void;
 }
 
 /**
- * Busca aplicada no envio, não a cada tecla: assim o botão voltar desfaz a
- * busca inteira de uma vez, em vez de letra por letra.
+ * Filtra ao vivo enquanto se digita, substituindo a entrada de histórico, e
+ * empilha uma entrada no Enter ou no blur. Assim a lista responde à tecla
+ * sem transformar cada letra num passo do botão voltar.
  */
-function CampoBusca({ valor, aoBuscar }: Props) {
+function CampoBusca({ valor, aoAplicar }: Props) {
+  const campo = useCampoDebounced(valor, aoAplicar);
+
   return (
     <form
       role="search"
       onSubmit={(evento) => {
         evento.preventDefault();
-        const campo = evento.currentTarget.elements.namedItem('busca');
-        if (campo instanceof HTMLInputElement) aoBuscar(campo.value);
+        campo.aoConfirmar();
       }}
       className="flex"
     >
@@ -25,13 +29,12 @@ function CampoBusca({ valor, aoBuscar }: Props) {
         Buscar por título, subtítulo ou autor
       </label>
       <input
-        /* A `key` remonta o campo quando o termo muda por fora — voltar no
-           navegador ou limpar filtros precisa refletir aqui. */
-        key={valor}
         id="busca"
         name="busca"
         type="search"
-        defaultValue={valor}
+        value={campo.valor}
+        onChange={(evento) => campo.aoDigitar(evento.target.value)}
+        onBlur={campo.aoConfirmar}
         placeholder="Buscar por título ou autor"
         className="w-full border border-grafite/40 bg-white px-3 py-2 text-sm text-tinta placeholder:text-grafite"
       />

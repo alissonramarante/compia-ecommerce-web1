@@ -145,6 +145,22 @@ function lerReaisEmCentavos(valor: string | null): number | undefined {
 }
 
 /**
+ * Caminho de volta: centavos → reais inteiros, para preencher o campo da
+ * faixa de preço. A faixa não trabalha com centavos, então um valor quebrado
+ * vindo de uma URL escrita à mão é arredondado só na exibição — o filtro em
+ * si continua usando o valor exato.
+ *
+ * Testes de mesa:
+ *   precoEmReais(5000)      → '50'
+ *   precoEmReais(19990)     → '200'
+ *   precoEmReais(0)         → '0'
+ *   precoEmReais(undefined) → ''
+ */
+export function precoEmReais(centavos: number | undefined): string {
+  return centavos === undefined ? '' : String(Math.round(centavos / 100));
+}
+
+/**
  * Traduz os parâmetros da URL no objeto de filtros. Estágios:
  *   1. `?categoria=` vem por slug (legível no link) e vira id, que é o que
  *      o produto guarda. Slug desconhecido é preservado como veio: não casa

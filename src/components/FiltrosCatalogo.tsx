@@ -6,6 +6,9 @@ import type {
   OrdenacaoCatalogo,
   TipoProduto,
 } from '../types';
+import type { EscritaDeFiltro } from '../lib/campoDebounced';
+import { precoEmReais } from '../lib/catalogo';
+import CampoPreco from './CampoPreco';
 
 interface Props {
   filtros: Filtros;
@@ -17,7 +20,7 @@ interface Props {
   aoAlternarCategoria: (slug: string) => void;
   aoAlternarTipo: (tipo: TipoProduto) => void;
   /** Valor em reais, como digitado. A conversão para centavos é da lib. */
-  aoMudarPreco: (campo: 'precoMin' | 'precoMax', valorEmReais: string) => void;
+  aoMudarPreco: (campo: 'precoMin' | 'precoMax', escrita: EscritaDeFiltro) => void;
   aoAlternarEstoque: () => void;
   /** String crua: quem valida é `lerFiltrosDaUrl`, na leitura. */
   aoMudarOrdenacao: (ordenacao: string) => void;
@@ -44,11 +47,6 @@ const CLASSE_CAIXA =
   'h-4 w-4 shrink-0 border border-grafite/50 accent-azul';
 const CLASSE_ITEM =
   'flex cursor-pointer items-center gap-2 py-1 text-sm text-tinta';
-
-/** Reais, sem centavos: a faixa de preço não precisa dessa precisão. */
-function emReais(centavos: number | undefined): string {
-  return centavos === undefined ? '' : String(Math.round(centavos / 100));
-}
 
 function FiltrosCatalogo({
   filtros,
@@ -167,32 +165,20 @@ function FiltrosCatalogo({
           <legend className={CLASSE_LEGENDA}>Faixa de preço</legend>
           <p className="mt-1 font-mono text-[11px] text-grafite">em reais</p>
           <div className="mt-2 flex items-center gap-2">
-            {(['precoMin', 'precoMax'] as const).map((campo) => (
-              <div key={campo} className="flex-1">
-                <label htmlFor={campo} className="sr-only">
-                  {campo === 'precoMin' ? 'Preço mínimo' : 'Preço máximo'}
-                </label>
-                <input
-                  /* Sem `value`: o campo é aplicado ao sair ou no Enter, para
-                     não empilhar uma entrada de histórico por tecla. A `key`
-                     força o remonte quando a URL muda por fora — é o que faz
-                     "Limpar filtros" esvaziar o campo. */
-                  key={`${campo}-${emReais(filtros[campo])}`}
-                  id={campo}
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  step={10}
-                  placeholder={campo === 'precoMin' ? 'mín.' : 'máx.'}
-                  defaultValue={emReais(filtros[campo])}
-                  onBlur={(evento) => aoMudarPreco(campo, evento.target.value)}
-                  onKeyDown={(evento) => {
-                    if (evento.key === 'Enter') evento.currentTarget.blur();
-                  }}
-                  className="w-full border border-grafite/40 bg-white px-3 py-2 font-mono text-sm text-tinta"
-                />
-              </div>
-            ))}
+            <CampoPreco
+              id="precoMin"
+              rotulo="Preço mínimo"
+              placeholder="mín."
+              valor={precoEmReais(filtros.precoMin)}
+              aoAplicar={(escrita) => aoMudarPreco('precoMin', escrita)}
+            />
+            <CampoPreco
+              id="precoMax"
+              rotulo="Preço máximo"
+              placeholder="máx."
+              valor={precoEmReais(filtros.precoMax)}
+              aoAplicar={(escrita) => aoMudarPreco('precoMax', escrita)}
+            />
           </div>
         </fieldset>
 

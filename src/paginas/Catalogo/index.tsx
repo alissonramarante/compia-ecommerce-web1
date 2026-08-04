@@ -35,12 +35,17 @@ function Catalogo() {
     filtros.ordenacao,
   );
 
-  /* 3. Escrita — cada alteração empilha uma entrada de histórico, então o
-        botão voltar desfaz um filtro por vez. */
-  const atualizar = (mutacao: (proximos: URLSearchParams) => void) => {
+  /* 3. Escrita — caixa e select empilham uma entrada de histórico, então o
+        botão voltar desfaz um filtro por vez. Campo de texto empilha só no
+        Enter/blur: enquanto se digita, `empilhar: false` substitui a entrada
+        atual e a lista filtra ao vivo sem virar dez passos do "voltar". */
+  const atualizar = (
+    mutacao: (proximos: URLSearchParams) => void,
+    empilhar = true,
+  ) => {
     const proximos = new URLSearchParams(parametros);
     mutacao(proximos);
-    setParametros(proximos);
+    setParametros(proximos, { replace: !empilhar });
   };
 
   const alternarValor = (chave: string, valor: string) =>
@@ -54,11 +59,11 @@ function Catalogo() {
       for (const item of restantes) proximos.append(chave, item);
     });
 
-  const definirValor = (chave: string, valor: string) =>
+  const definirValor = (chave: string, valor: string, empilhar = true) =>
     atualizar((proximos) => {
       if (valor.trim() === '') proximos.delete(chave);
       else proximos.set(chave, valor.trim());
-    });
+    }, empilhar);
 
   /* Ordenação não é filtro (ver `contarFiltrosAtivos`), então sobrevive ao
      "Limpar filtros". */
@@ -87,7 +92,10 @@ function Catalogo() {
 
         {!ehVisaoCategorias && (
           <div className="md:w-80">
-            <CampoBusca valor={filtros.busca} aoBuscar={(termo) => definirValor('busca', termo)} />
+            <CampoBusca
+              valor={filtros.busca}
+              aoAplicar={(escrita) => definirValor('busca', escrita.valor, escrita.empilhar)}
+            />
           </div>
         )}
       </header>
@@ -115,7 +123,9 @@ function Catalogo() {
               filtrosAtivos={filtrosAtivos}
               aoAlternarCategoria={(slug) => alternarValor('categoria', slug)}
               aoAlternarTipo={(tipo) => alternarValor('tipo', tipo)}
-              aoMudarPreco={(campo, valorEmReais) => definirValor(campo, valorEmReais)}
+              aoMudarPreco={(campo, escrita) =>
+                definirValor(campo, escrita.valor, escrita.empilhar)
+              }
               aoAlternarEstoque={() =>
                 definirValor('estoque', filtros.somenteEmEstoque ? '' : '1')
               }

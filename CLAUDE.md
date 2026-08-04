@@ -82,13 +82,21 @@ Não existe rota `/categorias`: categoria é filtro do catálogo, não seção.
 | Parâmetro | Efeito |
 | --- | --- |
 | `?visao=categorias` | Renderiza a grade das 6 categorias (nome, descrição, contagem de títulos) em vez da grade de produtos. Clicar numa categoria leva a `?categoria=slug`. |
-| `?categoria=slug` | Filtra por uma categoria. Aceita repetição para múltiplas. |
-| `?busca=termo` | Termo de busca. |
+| `?categoria=slug` | Filtra por uma categoria. Aceita repetição para múltiplas. Slug inexistente devolve lista vazia, não o catálogo inteiro. |
+| `?busca=termo` | Termo de busca. Cobre título, subtítulo e autores, sem acento e sem caixa (normalização `NFD`). |
 | `?tipo=fisico\|ebook\|kit` | Filtra por tipo. Aceita repetição. |
-| `?ordem=…` | Um dos valores de `OrdenacaoCatalogo`. |
+| `?tag=slug` | Filtra por tag. Aceita repetição. Sem UI própria: alimentado pelos links de tag da página do produto. |
+| `?precoMin=` / `?precoMax=` | Faixa de preço **em reais**, para o link ficar legível. A conversão para centavos acontece em `lerFiltrosDaUrl`, na fronteira. |
+| `?estoque=1` | Somente itens disponíveis. |
+| `?ordem=…` | Um dos valores de `OrdenacaoCatalogo`. Ordenação é apresentação, não filtro: não conta em `contarFiltrosAtivos` e sobrevive a "Limpar filtros". |
 
 O estado dos filtros vive na URL, não em `useState`. A URL tem que ser
 compartilhável e o botão voltar do navegador tem que funcionar.
+
+Campo de texto (busca, preço) atualiza a URL com `{ replace: true }` enquanto
+se digita, com debounce de ~250ms, e empilha uma entrada de histórico no
+Enter/blur. Assim a filtragem é ao vivo sem transformar cada tecla num passo
+do "voltar".
 
 ### Permissões
 
@@ -137,9 +145,15 @@ retângulos de moldura fina, não pílulas. Onde um círculo for inevitável
 (marcador de passo, radio), use valor arbitrário `rounded-[9999px]` e comente
 o motivo.
 
-Uma cor de acento por tela. Animação apenas em hover de card e transição entre
-passos do checkout. Respeitar `prefers-reduced-motion`. Foco de teclado sempre
-visível (anel `riso`).
+**Acento x cor semântica.** `riso` é o único acento promocional ou decorativo,
+e vale a regra de um por tela. `ocre` (estoque baixo, alerta) e um eventual
+vermelho de erro são **semânticos**: comunicam estado, não decoram, e não
+entram nessa conta. Um selo de promoção em `riso` e outro de estoque baixo em
+`ocre` na mesma grade está correto.
+
+Animação apenas em hover de card e transição entre passos do checkout.
+Respeitar `prefers-reduced-motion`. Foco de teclado sempre visível
+(anel `riso`).
 
 ## Microcópia
 
@@ -167,12 +181,17 @@ Tela vazia convida: "Seu carrinho está vazio. Ver catálogo."
 - **`formatarData`** usa `America/Sao_Paulo` para timestamps e formata datas
   `AAAA-MM-DD` pelos dígitos, sem passar por `Date`, para não perder um dia.
 - **Estado de filtro vive na URL**, não em `useState`.
-- Tokens substituem a paleta do Tailwind (ver Direção visual).
+- **Contagem por categoria é global**, não recalculada sobre o filtro ativo:
+  mostra o que existe atrás de cada categoria, não o que sobrou. Recalcular
+  faz as opções desaparecerem enquanto o usuário clica.
+- **Tokens substituem a paleta do Tailwind** (ver Direção visual): `theme.colors`,
+  não `theme.extend.colors`. Só `transparent`, `current`, `inherit`, `white`,
+  `black` e os seis tokens existem. `bg-gray-100` quebra o build de propósito.
 
 ## Roadmap
 
 1. ~~Scaffold: Vite + TS + Tailwind + tokens + fontes + layout + rotas vazias~~ ✅
-2. Catálogo: grade de produtos, busca, filtros, ordenação
+2. ~~Catálogo: grade de produtos, busca, filtros, ordenação~~ ✅
 3. Página do produto + ficha catalográfica
 4. Carrinho + contexto + persistência
 5. Checkout: endereço, frete, PIX e cartão, criação do pedido
