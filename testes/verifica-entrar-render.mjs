@@ -58,6 +58,14 @@ const corrompida = renderizarComProvedores('/entrar', {
 });
 caso('sessão corrompida cai no padrão sem quebrar', corrompida.includes('Yasmim<'));
 
+/* --- reset da demonstração --- */
+caso('secao de restauracao existe', padrao.includes('Restaurar dados de demonstração'));
+caso('diz o que sera apagado', padrao.includes('todos os carrinhos') && padrao.includes('todos os pedidos criados nesta máquina'));
+caso('diz que os mocks voltam', padrao.includes('voltam como estavam'));
+caso('avisa que a pagina recarrega', padrao.includes('A página recarrega em seguida'));
+caso('nao apaga sem confirmar', !padrao.includes('Apagar e restaurar'));
+caso('botao inicial e o de abrir a confirmacao', padrao.includes('>Restaurar demonstração<'));
+
 delete globalThis.localStorage;
 console.log('\n' + falhas + ' falha(s)');
 process.exit(falhas === 0 ? 0 : 1);

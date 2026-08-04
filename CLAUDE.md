@@ -30,6 +30,13 @@ negócio são **simuladas** assim:
 - Tailwind CSS
 - Context API + `useReducer` para carrinho, sessão e dados administrativos
 - Sem lib de componentes pronta. Ícones: `lucide-react`.
+- `qrcode.react` para o QR do PIX. Autorizada por exceção: gerar QR à mão exige
+  Reed-Solomon sobre GF(256) e escolha de máscara, e sem scanner o resultado
+  seria plausível e não verificável. Zero dependências de runtime.
+- **Dependência nova exige aprovação**, com tamanho e árvore transitiva
+  verificados antes de instalar. `npm install --dry-run` reconta binários
+  opcionais de plataforma; compare com a linha de base para isolar o que a
+  dependência realmente acrescenta.
 
 ## Estrutura
 
@@ -217,6 +224,48 @@ Tela vazia convida: "Seu carrinho está vazio. Ver catálogo."
 - **Tokens substituem a paleta do Tailwind** (ver Direção visual): `theme.colors`,
   não `theme.extend.colors`. Só `transparent`, `current`, `inherit`, `white`,
   `black` e os seis tokens existem. `bg-gray-100` quebra o build de propósito.
+- **Função pura nunca chama `new Date()`.** A hora entra por parâmetro
+  (`agora`), sempre. Vale para `validarValidade`, `cobrancaExpirada`,
+  `criarPedido` e `aplicarPagamento`. Teste que depende do relógio quebra em
+  janeiro.
+- **Dados de cartão não saem do formulário.** Número completo, CVV e validade
+  vivem no estado local do passo de pagamento. `Pagamento` guarda só os quatro
+  últimos dígitos e a bandeira. Nada disso entra em contexto, `localStorage`
+  ou log.
+- **Pedido nasce em `aguardando_pagamento`**, mesmo com cartão já aprovado, e
+  `aplicarPagamento` faz a transição. O histórico registra os dois momentos,
+  como nos mocks.
+- **Trocar de cliente com checkout em andamento aborta o checkout**, com aviso.
+  O carrinho é por cliente (chave sufixada), então o fluxo perderia a base.
+- **Alterar o CEP zera o frete escolhido.** As opções derivam dele; manter a
+  escolha cobraria valor errado.
+
+### Chaves de armazenamento
+
+Todas versionadas, todas lidas com `try/catch` e validação de forma, nenhuma
+confiável — `localStorage` é editável pelo usuário.
+
+```
+compia:carrinho:v1:{clienteId}   um carrinho por cliente
+compia:sessao:v1                 só os ids; id inexistente cai no padrão
+compia:pedidos:v1                semeado com os mocks só enquanto vazio
+```
+
+Depois da primeira gravação o armazenamento manda sobre os mocks, senão um
+pedido criado no checkout seria engolido pela semente a cada recarga.
+
+## Limitações conhecidas (documentar, não consertar)
+
+- **Duas abas se sobrescrevem.** A última a gravar vence. Resolver exigiria
+  ouvir o evento `storage`; não vale para o escopo.
+- **Estoque não é decrementado** ao criar pedido: `produtos` é array importado,
+  imutável. A Fatia 7 introduz `ProdutosContext` para o CRUD e é lá que o
+  pedido passa a baixar estoque.
+- **Payload PIX é fictício.** O QR é legível, mas nenhum banco aceita a
+  cobrança. Dito na própria tela, não só no commit.
+- **Frete do `ped-003` divergente.** O mock registra R$ 37,36; a fórmula daria
+  R$ 52,20. Pedido histórico registra o que foi cobrado e nada recalcula frete
+  de pedido existente — fica como está.
 
 **Percentual precisa de referência** quando há mais de uma base de comparação
 na mesma tela, ou quando o número é a afirmação principal. Escreva "16% abaixo
@@ -232,7 +281,7 @@ rotulado.
 2. ~~Catálogo: grade de produtos, busca, filtros, ordenação~~ ✅
 3. ~~Página do produto + ficha catalográfica~~ ✅
 4. Carrinho + contexto + persistência
-5. Checkout: endereço, frete, PIX e cartão, criação do pedido
+5. ~~Checkout: endereço, frete, PIX e cartão, criação do pedido~~ ✅
 6. Área do cliente: pedidos, downloads de e-book
 7. Admin: login por perfil, CRUD de produtos, pedidos, logs
 8. Polimento: responsivo, estados vazios, acessibilidade, README

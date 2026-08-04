@@ -24,6 +24,7 @@ const SUITES = [
   ['frete', 'verifica-frete.mjs', 'lib/frete: CEP, faixas, gratuidade'],
   ['pagamento', 'verifica-pagamento.mjs', 'lib/pagamento: Luhn, bandeira, PIX'],
   ['pedido', 'verifica-pedido.mjs', 'lib/pedido + persistência + reducer'],
+  ['demonstracao', 'verifica-demonstracao.mjs', 'lib/demonstracao: varredura e reset'],
   ['checkout', 'verifica-checkout.mjs', 'lib/checkout: passos, validação, PIX vencido'],
   ['catalogo (tela)', 'verifica-render.mjs', 'renderização do catálogo'],
   ['produto (tela)', 'verifica-produto-render.mjs', 'renderização do produto'],

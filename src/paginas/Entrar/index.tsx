@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { clientes } from '../../mocks';
 import { cidadeDoCliente, DOMINIO_DA_EQUIPE } from '../../lib/sessao';
+import { restaurarDemonstracao } from '../../lib/demonstracao';
 import { useSessao } from '../../hooks/useSessao';
 
 const CLASSE_TITULO_DE_SECAO =
@@ -15,6 +16,15 @@ function Entrar() {
   /* Estado local do formulário: o e-mail digitado não é sessão, é rascunho. */
   const [email, setEmail] = useState('');
   const [erro, setErro] = useState('');
+  const [confirmandoReset, setConfirmandoReset] = useState(false);
+
+  const restaurar = () => {
+    restaurarDemonstracao();
+    /* Recarregar é a saída honesta: os três providers ressemeiam a partir
+       dos mocks na montagem. Reconstruí-los à mão convidaria inconsistência
+       entre carrinho, sessão e pedidos. */
+    location.reload();
+  };
 
   const enviarAcessoDaEquipe = (evento: React.FormEvent<HTMLFormElement>) => {
     evento.preventDefault();
@@ -168,6 +178,53 @@ function Entrar() {
               </button>
             </div>
           </div>
+        )}
+      </section>
+
+      {/* 3. Reset da demonstração */}
+      <section className="mt-8 border border-ocre/60 bg-white p-6">
+        <h2 className={CLASSE_TITULO_DE_SECAO}>Restaurar dados de demonstração</h2>
+
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-grafite">
+          Apaga <strong className="font-semibold text-tinta">todos os carrinhos</strong>,
+          a sessão salva e{' '}
+          <strong className="font-semibold text-tinta">
+            todos os pedidos criados nesta máquina
+          </strong>
+          . Os quatro pedidos, os dez produtos e os três clientes dos dados de exemplo
+          voltam como estavam. A página recarrega em seguida.
+        </p>
+
+        {confirmandoReset ? (
+          <div className="mt-5 border-l-2 border-ocre pl-4">
+            <p className="text-sm font-semibold leading-relaxed text-tinta">
+              Isto não tem desfazer. Apagar mesmo?
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={restaurar}
+                className="bg-tinta px-5 py-2 font-display text-sm font-semibold text-papel transition-colors hover:bg-azul"
+              >
+                Apagar e restaurar
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmandoReset(false)}
+                className="font-display text-sm text-azul hover:underline"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirmandoReset(true)}
+            className="mt-5 border border-tinta px-5 py-2 font-display text-sm font-semibold text-tinta transition-colors hover:bg-tinta hover:text-papel"
+          >
+            Restaurar demonstração
+          </button>
         )}
       </section>
     </div>
