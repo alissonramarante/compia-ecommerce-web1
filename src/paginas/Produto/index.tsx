@@ -296,16 +296,20 @@ function Produto() {
               </ul>
 
               {kitCompensa && (
-                <p className="mt-4 text-sm leading-relaxed text-grafite">
-                  A soma dos três avulsos hoje é{' '}
-                  <span className="font-mono text-tinta">{formatarMoeda(kit.soma)}</span>. O
-                  kit sai por{' '}
-                  <span className="font-mono text-tinta">{formatarMoeda(preco)}</span> —{' '}
-                  <span className="font-mono text-tinta">
-                    {formatarMoeda(kit.economia)}
-                  </span>{' '}
-                  a menos, ou {kit.percentual}% abaixo da compra separada.
-                </p>
+                /* Prosa de venda, não dado catalográfico: sem monoespaçada.
+                   O destaque nos valores é só de cor, na mesma serifada do
+                   texto em volta. */
+                <div className="mt-4 space-y-2 text-sm leading-relaxed text-grafite">
+                  <p>
+                    A soma dos três avulsos hoje é{' '}
+                    <span className="text-tinta">{formatarMoeda(kit.soma)}</span>.
+                  </p>
+                  <p>
+                    O kit sai por <span className="text-tinta">{formatarMoeda(preco)}</span>{' '}
+                    — <span className="text-tinta">{formatarMoeda(kit.economia)}</span> a
+                    menos, ou {kit.percentual}% abaixo da compra separada.
+                  </p>
+                </div>
               )}
             </section>
           )}
