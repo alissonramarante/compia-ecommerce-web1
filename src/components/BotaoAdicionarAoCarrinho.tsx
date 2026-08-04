@@ -1,7 +1,9 @@
-import { ShoppingBag } from 'lucide-react';
+import { Check, ShoppingBag } from 'lucide-react';
 
 interface Props {
   disponivel: boolean;
+  /** Confirmação temporária. Quem controla o tempo é quem passa a prop. */
+  confirmado?: boolean;
   onAdicionar: () => void;
 }
 
@@ -10,7 +12,7 @@ interface Props {
  * que o título existe e está fora. Nada de confirmação falsa de sucesso —
  * quem trata o clique é quem passa `onAdicionar`.
  */
-function BotaoAdicionarAoCarrinho({ disponivel, onAdicionar }: Props) {
+function BotaoAdicionarAoCarrinho({ disponivel, confirmado = false, onAdicionar }: Props) {
   if (!disponivel) {
     return (
       <button
@@ -28,10 +30,21 @@ function BotaoAdicionarAoCarrinho({ disponivel, onAdicionar }: Props) {
     <button
       type="button"
       onClick={onAdicionar}
-      className="flex w-full items-center justify-center gap-2 bg-azul px-6 py-3 font-display text-sm font-semibold text-papel transition-colors hover:bg-tinta"
+      className={`flex w-full items-center justify-center gap-2 px-6 py-3 font-display text-sm font-semibold text-papel transition-colors ${
+        confirmado ? 'bg-tinta' : 'bg-azul hover:bg-tinta'
+      }`}
     >
-      <ShoppingBag size={18} strokeWidth={1.75} aria-hidden="true" />
-      Adicionar ao carrinho
+      {confirmado ? (
+        <>
+          <Check size={18} strokeWidth={2} aria-hidden="true" />
+          Adicionado
+        </>
+      ) : (
+        <>
+          <ShoppingBag size={18} strokeWidth={1.75} aria-hidden="true" />
+          Adicionar ao carrinho
+        </>
+      )}
     </button>
   );
 }

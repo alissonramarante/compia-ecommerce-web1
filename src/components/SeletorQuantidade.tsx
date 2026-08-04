@@ -2,14 +2,30 @@ import { Minus, Plus } from 'lucide-react';
 import { limitarQuantidade } from '../lib/produto';
 
 interface Props {
+  /**
+   * Precisa ser único na página: o carrinho renderiza um seletor por linha,
+   * e id repetido quebra a associação do `<label>`.
+   */
+  idDoCampo: string;
+  /** Título do produto, para os rótulos fazerem sentido fora de contexto. */
+  descricao: string;
   quantidade: number;
-  /** Teto. `null` é ilimitado — o componente não é usado nesse caso hoje. */
+  /** Teto. `null` é ilimitado. */
   maximo: number | null;
+  /** Mostra "Quantidade" ao lado. Na tabela do carrinho a coluna já diz. */
+  rotuloVisivel?: boolean;
   aoMudar: (quantidade: number) => void;
 }
 
 /** Menos / campo / mais. O clamp é da lib; aqui só se chama. */
-function SeletorQuantidade({ quantidade, maximo, aoMudar }: Props) {
+function SeletorQuantidade({
+  idDoCampo,
+  descricao,
+  quantidade,
+  maximo,
+  rotuloVisivel = false,
+  aoMudar,
+}: Props) {
   const noPiso = quantidade <= 1;
   const noTeto = maximo !== null && quantidade >= maximo;
 
@@ -18,9 +34,16 @@ function SeletorQuantidade({ quantidade, maximo, aoMudar }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <span id="rotulo-quantidade" className="font-mono text-xs uppercase tracking-widest text-grafite">
-        Quantidade
-      </span>
+      <label
+        htmlFor={idDoCampo}
+        className={
+          rotuloVisivel
+            ? 'font-mono text-xs uppercase tracking-widest text-grafite'
+            : 'sr-only'
+        }
+      >
+        {rotuloVisivel ? 'Quantidade' : `Quantidade de ${descricao}`}
+      </label>
 
       <div className="flex items-center">
         <button
@@ -28,16 +51,13 @@ function SeletorQuantidade({ quantidade, maximo, aoMudar }: Props) {
           className={classeBotao}
           onClick={() => aoMudar(limitarQuantidade(quantidade - 1, maximo))}
           disabled={noPiso}
-          aria-label="Diminuir quantidade"
+          aria-label={`Diminuir quantidade de ${descricao}`}
         >
           <Minus size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
 
-        <label htmlFor="quantidade" className="sr-only">
-          Quantidade
-        </label>
         <input
-          id="quantidade"
+          id={idDoCampo}
           type="number"
           inputMode="numeric"
           min={1}
@@ -52,13 +72,13 @@ function SeletorQuantidade({ quantidade, maximo, aoMudar }: Props) {
           className={classeBotao}
           onClick={() => aoMudar(limitarQuantidade(quantidade + 1, maximo))}
           disabled={noTeto}
-          aria-label="Aumentar quantidade"
+          aria-label={`Aumentar quantidade de ${descricao}`}
         >
           <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
       </div>
 
-      {maximo !== null && (
+      {rotuloVisivel && maximo !== null && (
         <span className="font-mono text-xs text-grafite">de {maximo}</span>
       )}
     </div>

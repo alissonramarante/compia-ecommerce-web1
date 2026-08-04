@@ -18,6 +18,9 @@ import {
   relacionados,
 } from '../../lib/produto';
 import { formatarMoeda } from '../../lib/formatadores';
+import { mensagemDeAdicao } from '../../lib/carrinho';
+import { useCarrinho } from '../../hooks/useCarrinho';
+import { useSinalTemporario } from '../../hooks/useSinalTemporario';
 import BotaoAdicionarAoCarrinho from '../../components/BotaoAdicionarAoCarrinho';
 import CartaoProduto from '../../components/CartaoProduto';
 import FichaCatalografica from '../../components/FichaCatalografica';
@@ -32,6 +35,8 @@ function Produto() {
   const { slug } = useParams();
   const produto = buscarPorSlug(produtos, slug ?? '');
   const [quantidade, setQuantidade] = useState(1);
+  const { adicionar, quantidadeTotal } = useCarrinho();
+  const confirmacao = useSinalTemporario(2000);
 
   /* Título da aba. Restaurado no desmonte para não vazar para a próxima
      rota — o React Router não recarrega a página. */
@@ -93,8 +98,10 @@ function Produto() {
      anunciar economia negativa. */
   const kitCompensa = kit.economia > 0;
 
-  /* Fatia 4 */
-  const adicionarAoCarrinho = () => {};
+  const adicionarAoCarrinho = () => {
+    adicionar(produto, quantidade);
+    confirmacao.disparar();
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 md:px-6">
@@ -241,16 +248,27 @@ function Produto() {
             {/* E-book não tem quantidade: o download é um só. */}
             {produto.tipo !== 'ebook' && disponivel && (
               <SeletorQuantidade
+                idDoCampo="quantidade"
+                descricao={produto.titulo}
                 quantidade={quantidade}
                 maximo={produto.estoque}
+                rotuloVisivel
                 aoMudar={(nova) => setQuantidade(limitarQuantidade(nova, produto.estoque))}
               />
             )}
 
             <BotaoAdicionarAoCarrinho
               disponivel={disponivel}
+              confirmado={confirmacao.ativo}
               onAdicionar={adicionarAoCarrinho}
             />
+
+            {/* A região existe desde o primeiro render: leitor de tela só
+                anuncia mudança dentro de um live region já presente. O
+                retorno visual é a troca de texto do botão. */}
+            <p aria-live="polite" className="sr-only">
+              {confirmacao.ativo ? mensagemDeAdicao(produto.titulo, quantidadeTotal) : ''}
+            </p>
 
             {produto.tipo === 'ebook' && (
               <div className="border border-grafite/30 bg-white p-4">

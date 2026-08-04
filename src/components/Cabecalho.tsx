@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, ShoppingBag, X } from 'lucide-react';
+import { useCarrinho } from '../hooks/useCarrinho';
 
 /**
  * "Categorias" ainda não tem rota própria na especificação: as categorias são
@@ -13,11 +14,9 @@ const navegacao = [
   { rotulo: 'Conta', destino: '/conta' },
 ];
 
-/** Fatia 1 não tem carrinho ainda; o contador nasce zerado. */
-const QUANTIDADE_NO_CARRINHO = 0;
-
 function Cabecalho() {
   const [menuAberto, setMenuAberto] = useState(false);
+  const { quantidadeTotal } = useCarrinho();
   const { pathname, search } = useLocation();
   const rotaAtual = `${pathname}${search}`;
 
@@ -60,16 +59,23 @@ function Cabecalho() {
           <Link
             to="/carrinho"
             className="flex items-center gap-2 px-2 py-1 text-tinta transition-colors hover:text-azul"
-            aria-label={`Carrinho, ${QUANTIDADE_NO_CARRINHO} itens`}
+            aria-label={
+              quantidadeTotal === 1
+                ? 'Carrinho, 1 item'
+                : `Carrinho, ${quantidadeTotal} itens`
+            }
             onClick={() => setMenuAberto(false)}
           >
             <ShoppingBag size={20} strokeWidth={1.75} aria-hidden="true" />
-            <span
-              aria-hidden="true"
-              className="min-w-[1.5rem] border border-grafite/40 px-1 py-px text-center font-mono text-xs leading-5 text-grafite"
-            >
-              {QUANTIDADE_NO_CARRINHO}
-            </span>
+            {/* Carrinho vazio mostra só o ícone: um "0" é ruído. */}
+            {quantidadeTotal > 0 && (
+              <span
+                aria-hidden="true"
+                className="min-w-[1.5rem] border border-grafite/40 px-1 py-px text-center font-mono text-xs leading-5 text-grafite"
+              >
+                {quantidadeTotal}
+              </span>
+            )}
           </Link>
 
           {/* Hambúrguer — abaixo de 768px */}

@@ -47,6 +47,24 @@ src/
 
 ## Convenções de código
 
+- **Mecânica em `lib/`, casca em `hooks/`.** Regra de negócio e decisão
+  (quando escrever, se empilha histórico, como reconciliar) vive em `src/lib/`
+  como função pura, testável sem DOM. O hook só liga isso ao React. O projeto
+  não tem jsdom e não pode instalar: o que não for testável sem DOM é
+  efetivamente não testado.
+- **Teste de renderização** usa `renderToStaticMarkup` + `MemoryRouter`, em
+  suítes fora de `src/`. Testes de mesa das funções puras ficam em comentário
+  no próprio arquivo e são executados contra os mocks reais.
+- **Nunca hardcodar valor derivado em prosa.** Percentual, soma e economia são
+  calculados. Um "18% de desconto" escrito na descrição do mock desatualiza
+  sozinho — foi exatamente o que aconteceu com `prod-009`.
+- **Sentinelas de dado ficam em constante exportada**, não em string solta no
+  JSX. Ex.: `AUTOR_COLETIVO` em `lib/produto.ts` — `'Vários autores'` é rótulo,
+  não pessoa, e não vira link. Comparação exata, sem normalizar: normalizar
+  esconderia inconsistência de cadastro num dado que é controlado.
+- **Despacho é decidido por `peso > 0`, não por `tipo === 'fisico'`.** O kit
+  pesa 2730 g e é despachado. O requisito real é "precisa de entrega física".
+
 - Nomes de domínio em **português** (`Produto`, `adicionarItem`, `calcularFrete`).
   Nomes de API do React/Tailwind ficam em inglês, como são.
 - Componentes funcionais, um por arquivo, export default.
@@ -85,7 +103,7 @@ Não existe rota `/categorias`: categoria é filtro do catálogo, não seção.
 | `?categoria=slug` | Filtra por uma categoria. Aceita repetição para múltiplas. Slug inexistente devolve lista vazia, não o catálogo inteiro. |
 | `?busca=termo` | Termo de busca. Cobre título, subtítulo e autores, sem acento e sem caixa (normalização `NFD`). |
 | `?tipo=fisico\|ebook\|kit` | Filtra por tipo. Aceita repetição. |
-| `?tag=slug` | Filtra por tag. Aceita repetição. Sem UI própria: alimentado pelos links de tag da página do produto. |
+| `?tag=valor` | Filtra pela tag exata do mock, com o valor bruto (`?tag=deep%20learning`), não slugificado. Aceita repetição. Sem UI própria: alimentado pelos links de tag da página do produto. |
 | `?precoMin=` / `?precoMax=` | Faixa de preço **em reais**, para o link ficar legível. A conversão para centavos acontece em `lerFiltrosDaUrl`, na fronteira. |
 | `?estoque=1` | Somente itens disponíveis. |
 | `?ordem=…` | Um dos valores de `OrdenacaoCatalogo`. Ordenação é apresentação, não filtro: não conta em `contarFiltrosAtivos` e sobrevive a "Limpar filtros". |
@@ -188,11 +206,19 @@ Tela vazia convida: "Seu carrinho está vazio. Ver catálogo."
   não `theme.extend.colors`. Só `transparent`, `current`, `inherit`, `white`,
   `black` e os seis tokens existem. `bg-gray-100` quebra o build de propósito.
 
+**Percentual precisa de referência** quando há mais de uma base de comparação
+na mesma tela, ou quando o número é a afirmação principal. Escreva "16% abaixo
+do preço de tabela", não "(16%)". Selo de capa que só repete o da grade está
+dispensado — em produto simples existe um único significado de desconto. Na
+página do kit, ao contrário, conviviam dois denominadores (tabela do kit e soma
+dos avulsos): lá o selo genérico foi suprimido e sobrou um único percentual,
+rotulado.
+
 ## Roadmap
 
 1. ~~Scaffold: Vite + TS + Tailwind + tokens + fontes + layout + rotas vazias~~ ✅
 2. ~~Catálogo: grade de produtos, busca, filtros, ordenação~~ ✅
-3. Página do produto + ficha catalográfica
+3. ~~Página do produto + ficha catalográfica~~ ✅
 4. Carrinho + contexto + persistência
 5. Checkout: endereço, frete, PIX e cartão, criação do pedido
 6. Área do cliente: pedidos, downloads de e-book
