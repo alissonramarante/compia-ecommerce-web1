@@ -109,3 +109,43 @@ export function formatarCep(cep: string): string {
   if (digitos.length <= 5) return digitos;
   return `${digitos.slice(0, 5)}-${digitos.slice(5)}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* 4. CPF                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Mascara o CPF preservando o miolo, que é o que a pessoa usa para
+ * reconhecer o próprio documento. Esconde os três primeiros dígitos e os
+ * dois do verificador.
+ *
+ * Aceita entrada com ou sem pontuação e sempre devolve pontuada.
+ *
+ * Testes de mesa:
+ *   mascararCpf('123.456.789-00') → '***.456.789-**'
+ *   mascararCpf('12345678900')    → '***.456.789-**'
+ *   mascararCpf('987.654.321-00') → '***.654.321-**'
+ *   mascararCpf('123')            → '***.***.***-**'  (curto: esconde tudo)
+ *   mascararCpf('')               → '***.***.***-**'
+ */
+export function mascararCpf(cpf: string): string {
+  const digitos = cpf.replace(/\D/g, '');
+  if (digitos.length !== 11) return '***.***.***-**';
+
+  return `***.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-**`;
+}
+
+/**
+ * CPF por extenso, pontuado. Usado só quando a pessoa pede para revelar.
+ *
+ * Testes de mesa:
+ *   formatarCpf('12345678900')    → '123.456.789-00'
+ *   formatarCpf('123.456.789-00') → '123.456.789-00'
+ *   formatarCpf('123')            → '123'   (devolve o que veio, sem inventar)
+ */
+export function formatarCpf(cpf: string): string {
+  const digitos = cpf.replace(/\D/g, '');
+  if (digitos.length !== 11) return cpf;
+
+  return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
+}

@@ -25,11 +25,13 @@ const SUITES = [
   ['pagamento', 'verifica-pagamento.mjs', 'lib/pagamento: Luhn, bandeira, PIX'],
   ['pedido', 'verifica-pedido.mjs', 'lib/pedido + persistência + reducer'],
   ['demonstracao', 'verifica-demonstracao.mjs', 'lib/demonstracao: varredura e reset'],
+  ['conta', 'verifica-conta.mjs', 'lib/conta: abas, downloads, recompra'],
   ['checkout', 'verifica-checkout.mjs', 'lib/checkout: passos, validação, PIX vencido'],
   ['catalogo (tela)', 'verifica-render.mjs', 'renderização do catálogo'],
   ['produto (tela)', 'verifica-produto-render.mjs', 'renderização do produto'],
   ['carrinho (tela)', 'verifica-carrinho-render.mjs', 'renderização do carrinho'],
   ['entrar (tela)', 'verifica-entrar-render.mjs', 'renderização da tela de entrar'],
+  ['conta (tela)', 'verifica-conta-render.mjs', 'renderização das três abas da conta'],
   ['checkout (tela)', 'verifica-checkout-render.mjs', 'renderização do checkout e do pedido'],
 ];
 
