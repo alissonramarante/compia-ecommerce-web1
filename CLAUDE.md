@@ -75,6 +75,21 @@ src/
 /admin/logs             registro de atividade
 ```
 
+### Parâmetros de `/catalogo`
+
+Não existe rota `/categorias`: categoria é filtro do catálogo, não seção.
+
+| Parâmetro | Efeito |
+| --- | --- |
+| `?visao=categorias` | Renderiza a grade das 6 categorias (nome, descrição, contagem de títulos) em vez da grade de produtos. Clicar numa categoria leva a `?categoria=slug`. |
+| `?categoria=slug` | Filtra por uma categoria. Aceita repetição para múltiplas. |
+| `?busca=termo` | Termo de busca. |
+| `?tipo=fisico\|ebook\|kit` | Filtra por tipo. Aceita repetição. |
+| `?ordem=…` | Um dos valores de `OrdenacaoCatalogo`. |
+
+O estado dos filtros vive na URL, não em `useState`. A URL tem que ser
+compartilhável e o botão voltar do navegador tem que funcionar.
+
 ### Permissões
 
 - `admin`: tudo.
@@ -93,26 +108,38 @@ Tokens (definir em `tailwind.config.js`, usar só estes):
 ```
 tinta      #101418   texto e fundo escuro
 papel      #EEF0EA   fundo (levemente frio, não creme)
-indigo     #23319E   ações primárias, links
+azul       #23319E   ações primárias, links
 riso       #FF4F7B   acento único: promoção, badge, foco
 ocre       #D9A521   alertas e estoque baixo
 grafite    #5C6670   texto secundário, bordas
 ```
+
+Os tokens **substituem** a paleta do Tailwind, não a estendem: `bg-azul`
+funciona, `bg-azul-500` não existe. Nenhum nome de token deve colidir com uma
+paleta nativa do Tailwind — uma classe inexistente falha em silêncio, sem erro
+de build. Foi por isso que `indigo` virou `azul`.
 
 Tipografia (Google Fonts):
 
 - Display: **Bricolage Grotesque** — títulos, com moderação.
 - Corpo: **Source Serif 4** — descrições, texto longo. É uma editora.
 - Utilitária: **IBM Plex Mono** — preço, ISBN, SKU, número de pedido, prazo.
-  Monoespaçada só onde o dado é *catalográfico*, nunca como decoração.
+  Monoespaçada onde o dado é *catalográfico* ou *numeral tabular* (quantidade,
+  contador, prazo em dias) — nunca como decoração, nunca em texto corrido.
 
 Elemento assinatura: a **ficha catalográfica** na página do produto — bloco em
 Plex Mono com moldura fina reproduzindo a ficha CIP real (autor, título, ISBN,
 CDU, páginas, edição). É o que diferencia esta loja de qualquer e-commerce.
 
-Regras: `border-radius` no máximo 4px. Uma cor de acento por tela. Animação
-apenas em hover de card e transição entre passos do checkout. Respeitar
-`prefers-reduced-motion`. Foco de teclado sempre visível (anel `riso`).
+Regras: `borderRadius` é **sobrescrito** no tema, de `none` a `lg`, entre 0 e
+4px. `rounded-full` e `rounded-xl` não existem — badges e contadores são
+retângulos de moldura fina, não pílulas. Onde um círculo for inevitável
+(marcador de passo, radio), use valor arbitrário `rounded-[9999px]` e comente
+o motivo.
+
+Uma cor de acento por tela. Animação apenas em hover de card e transição entre
+passos do checkout. Respeitar `prefers-reduced-motion`. Foco de teclado sempre
+visível (anel `riso`).
 
 ## Microcópia
 
@@ -129,9 +156,22 @@ Tela vazia convida: "Seu carrinho está vazio. Ver catálogo."
 - Não instale dependência nova sem perguntar.
 - Não crie backend, API route, nem `fetch` para serviço externo.
 
+## Decisões já tomadas (não relitigar)
+
+- **Build:** `tsc --noEmit && vite build`, com um `tsconfig.json` único que
+  inclui `vite.config.ts`. Project references e `tsc -b` foram descartados
+  (TS 5.9 recusa projeto referenciado com `noEmit`). Não reintroduzir
+  `tsconfig.node.json`.
+- **`main.tsx`** valida a existência de `#raiz` e lança erro explícito em vez
+  de usar `!`.
+- **`formatarData`** usa `America/Sao_Paulo` para timestamps e formata datas
+  `AAAA-MM-DD` pelos dígitos, sem passar por `Date`, para não perder um dia.
+- **Estado de filtro vive na URL**, não em `useState`.
+- Tokens substituem a paleta do Tailwind (ver Direção visual).
+
 ## Roadmap
 
-1. Scaffold: Vite + TS + Tailwind + tokens + fontes + layout (cabeçalho, rodapé) + rotas vazias
+1. ~~Scaffold: Vite + TS + Tailwind + tokens + fontes + layout + rotas vazias~~ ✅
 2. Catálogo: grade de produtos, busca, filtros, ordenação
 3. Página do produto + ficha catalográfica
 4. Carrinho + contexto + persistência
