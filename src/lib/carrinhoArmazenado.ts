@@ -13,8 +13,24 @@ import { formatarMoeda } from './formatadores';
  * falha aceitável, exceção na inicialização não é.
  */
 
-/** Versionada: mudar o formato de `ItemCarrinho` significa subir para v2. */
-export const CHAVE_CARRINHO = 'compia:carrinho:v1';
+/**
+ * Versionada: mudar o formato de `ItemCarrinho` significa subir para v2.
+ *
+ * O carrinho é **por cliente**. Sem o sufixo, trocar de cliente no seletor
+ * de demonstração deixaria o pedido sair com o `clienteId` de um e os itens
+ * de outro.
+ */
+const PREFIXO_CARRINHO = 'compia:carrinho:v1';
+
+export function chaveDoCarrinho(clienteId: string): string {
+  return `${PREFIXO_CARRINHO}:${clienteId}`;
+}
+
+/**
+ * Chave usada antes de o carrinho passar a ser por cliente. Sobrevive só até
+ * a primeira carga, quando seu conteúdo é adotado pelo cliente corrente.
+ */
+export const CHAVE_CARRINHO_ANTIGA = PREFIXO_CARRINHO;
 
 /* ------------------------------------------------------------------ */
 /* 1. Serialização                                                     */
@@ -88,11 +104,38 @@ export function desserializar(bruto: string): ItemCarrinho[] {
  * SSR ele nem existe. Nenhum dos dois pode quebrar o carrinho da sessão,
  * que continua vivo em memória.
  */
-export function carregar(): ItemCarrinho[] {
+/**
+ * Passa o carrinho da chave sem sufixo para o cliente corrente e apaga a
+ * antiga. Roda uma vez só: depois de removida, não há o que migrar.
+ *
+ * Se o cliente já tiver carrinho próprio, o conteúdo antigo é descartado em
+ * vez de sobrescrever — o dado específico é mais novo que o genérico.
+ */
+export function migrarChaveAntiga(clienteId: string): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+
+    const antigo = localStorage.getItem(CHAVE_CARRINHO_ANTIGA);
+    if (antigo === null) return;
+
+    const chave = chaveDoCarrinho(clienteId);
+    if (localStorage.getItem(chave) === null) {
+      localStorage.setItem(chave, antigo);
+    }
+
+    localStorage.removeItem(CHAVE_CARRINHO_ANTIGA);
+  } catch {
+    /* Migração é conveniência: falhar aqui não pode impedir de comprar. */
+  }
+}
+
+export function carregar(clienteId: string): ItemCarrinho[] {
   try {
     if (typeof localStorage === 'undefined') return [];
 
-    const bruto = localStorage.getItem(CHAVE_CARRINHO);
+    migrarChaveAntiga(clienteId);
+
+    const bruto = localStorage.getItem(chaveDoCarrinho(clienteId));
     if (bruto === null) return [];
 
     return desserializar(bruto);
@@ -101,11 +144,11 @@ export function carregar(): ItemCarrinho[] {
   }
 }
 
-export function salvar(itens: ItemCarrinho[]): void {
+export function salvar(clienteId: string, itens: ItemCarrinho[]): void {
   try {
     if (typeof localStorage === 'undefined') return;
 
-    localStorage.setItem(CHAVE_CARRINHO, serializar(itens));
+    localStorage.setItem(chaveDoCarrinho(clienteId), serializar(itens));
   } catch {
     /* Sem espaço ou sem permissão: a sessão segue, só não persiste. */
   }
@@ -193,7 +236,10 @@ export function reconciliar(
   return { itens: reconciliados, avisos };
 }
 
-/** Carga inicial: lê, valida e reconcilia numa passada. */
-export function carregarReconciliado(produtos: Produto[]): ResultadoDaReconciliacao {
-  return reconciliar(carregar(), produtos);
+/** Carga inicial de um cliente: migra se preciso, lê, valida e reconcilia. */
+export function carregarReconciliado(
+  produtos: Produto[],
+  clienteId: string,
+): ResultadoDaReconciliacao {
+  return reconciliar(carregar(clienteId), produtos);
 }

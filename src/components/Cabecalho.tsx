@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, ShoppingBag, X } from 'lucide-react';
+import { Menu, ShoppingBag, UserRound, X } from 'lucide-react';
 import { useCarrinho } from '../hooks/useCarrinho';
 import { useSessao } from '../hooks/useSessao';
 import { primeiroNome } from '../lib/sessao';
@@ -22,18 +22,25 @@ function Cabecalho() {
   const { pathname, search } = useLocation();
   const rotaAtual = `${pathname}${search}`;
 
-  /* "Conta" mostra de quem é a sessão. Com o seletor de cliente da tela de
-     entrar, saber quem está comprando importa mais que o rótulo genérico. */
-  const itensDeNavegacao = [
-    ...navegacao,
-    { rotulo: primeiroNome(clienteCorrente.nome), destino: '/conta' },
-  ];
-
   const classeDoLink = (ativo: boolean) =>
     [
       'font-display text-sm tracking-tight transition-colors',
       ativo ? 'text-azul' : 'text-tinta hover:text-azul',
     ].join(' ');
+
+  /* O nome mostra de quem é a sessão, mas nome solto na navegação não diz
+     que é link de conta: o ícone e o rótulo acessível fazem esse trabalho. */
+  const linkDaConta = (
+    <NavLink
+      to="/conta"
+      onClick={() => setMenuAberto(false)}
+      aria-label={`Conta de ${clienteCorrente.nome}`}
+      className={`flex items-center gap-2 ${classeDoLink('/conta' === rotaAtual)}`}
+    >
+      <UserRound size={16} strokeWidth={1.75} aria-hidden="true" />
+      {primeiroNome(clienteCorrente.nome)}
+    </NavLink>
+  );
 
   return (
     <header className="border-b border-grafite/30 bg-papel">
@@ -53,13 +60,14 @@ function Cabecalho() {
         {/* Navegação — 768px para cima */}
         <nav aria-label="Principal" className="hidden md:block">
           <ul className="flex items-center gap-8">
-            {itensDeNavegacao.map((item) => (
+            {navegacao.map((item) => (
               <li key={item.rotulo}>
                 <NavLink to={item.destino} className={classeDoLink(item.destino === rotaAtual)}>
                   {item.rotulo}
                 </NavLink>
               </li>
             ))}
+            <li>{linkDaConta}</li>
           </ul>
         </nav>
 
@@ -113,7 +121,7 @@ function Cabecalho() {
           className="border-t border-grafite/30 bg-papel md:hidden"
         >
           <ul className="mx-auto max-w-6xl px-4 py-2">
-            {itensDeNavegacao.map((item) => (
+            {navegacao.map((item) => (
               <li key={item.rotulo} className="border-b border-grafite/20 last:border-b-0">
                 <NavLink
                   to={item.destino}
@@ -124,6 +132,7 @@ function Cabecalho() {
                 </NavLink>
               </li>
             ))}
+            <li className="py-3">{linkDaConta}</li>
           </ul>
         </nav>
       )}

@@ -11,6 +11,7 @@ import {
   removerItem,
 } from '../lib/carrinho';
 import { carregarReconciliado, salvar } from '../lib/carrinhoArmazenado';
+import { useSessao } from '../hooks/useSessao';
 
 export interface Aviso {
   id: string;
@@ -18,6 +19,12 @@ export interface Aviso {
 }
 
 export interface EstadoCarrinho {
+  /**
+   * De quem é este carrinho. Fica no estado, e não só na sessão, porque é o
+   * que garante que a gravação nunca use a chave de um cliente com os itens
+   * de outro: os dois mudam na mesma ação.
+   */
+  clienteId: string;
   itens: ItemCarrinho[];
   avisos: Aviso[];
 }
@@ -27,15 +34,16 @@ export type AcaoCarrinho =
   | { tipo: 'remover'; produtoId: string }
   | { tipo: 'alterar'; produto: Produto; quantidade: number }
   | { tipo: 'limpar' }
-  | { tipo: 'descartarAviso'; id: string };
+  | { tipo: 'descartarAviso'; id: string }
+  | { tipo: 'trocarCliente'; clienteId: string; itens: ItemCarrinho[]; avisos: Aviso[] };
 
 /**
  * Reducer puro: sem `localStorage`, sem relógio, sem aleatório. Só delega
  * para `lib/carrinho.ts`. Está exportado porque é testável sozinho, e é
  * onde as regras de limite não podem escapar.
  *
- * O teto de quantidade é aplicado aqui, e não em `alterarQuantidade`, porque
- * a função da lib não recebe o produto e portanto não conhece o estoque.
+ * `trocarCliente` recebe os itens já lidos e reconciliados: quem toca no
+ * armazenamento é o efeito, não o reducer.
  */
 export function reducerCarrinho(
   estado: EstadoCarrinho,
@@ -69,20 +77,22 @@ export function reducerCarrinho(
         ...estado,
         avisos: estado.avisos.filter((aviso) => aviso.id !== acao.id),
       };
+
+    case 'trocarCliente':
+      return { clienteId: acao.clienteId, itens: acao.itens, avisos: acao.avisos };
   }
 }
 
-/**
- * Carga inicial, uma vez só. Os avisos nascem aqui e não são produzidos
- * depois, então o índice serve de id estável.
- */
-export function criarEstadoInicial(): EstadoCarrinho {
-  const { itens, avisos } = carregarReconciliado(produtos);
+/** Avisos nascem só na carga, então o índice serve de id estável. */
+function comIds(textos: string[]): Aviso[] {
+  return textos.map((texto, indice) => ({ id: `aviso-${indice}`, texto }));
+}
 
-  return {
-    itens,
-    avisos: avisos.map((texto, indice) => ({ id: `aviso-${indice}`, texto })),
-  };
+/** Carga inicial do cliente corrente. */
+export function criarEstadoInicial(clienteId: string): EstadoCarrinho {
+  const { itens, avisos } = carregarReconciliado(produtos, clienteId);
+
+  return { clienteId, itens, avisos: comIds(avisos) };
 }
 
 export interface ValorDoCarrinho {
@@ -104,14 +114,33 @@ interface Props {
 }
 
 function CarrinhoProvider({ children }: Props) {
-  const [estado, despachar] = useReducer(reducerCarrinho, undefined, criarEstadoInicial);
+  const { clienteCorrente } = useSessao();
+  const [estado, despachar] = useReducer(
+    reducerCarrinho,
+    clienteCorrente.id,
+    criarEstadoInicial,
+  );
 
-  /* A escrita vive fora do reducer. Roda também na montagem, o que grava de
-     volta o carrinho já reconciliado — o que estava velho no armazenamento
-     não sobrevive ao primeiro carregamento. */
+  /* Troca de cliente: carrega o carrinho do novo. A leitura acontece aqui,
+     na fronteira, e o reducer só recebe o resultado pronto. */
   useEffect(() => {
-    salvar(estado.itens);
-  }, [estado.itens]);
+    if (estado.clienteId === clienteCorrente.id) return;
+
+    const { itens, avisos } = carregarReconciliado(produtos, clienteCorrente.id);
+    despachar({
+      tipo: 'trocarCliente',
+      clienteId: clienteCorrente.id,
+      itens,
+      avisos: comIds(avisos),
+    });
+  }, [clienteCorrente.id, estado.clienteId]);
+
+  /* Grava sempre sob a chave do dono guardado no estado, nunca sob a da
+     sessão: no render em que o cliente muda, o estado ainda é o do anterior,
+     e é exatamente onde os itens dele pertencem. */
+  useEffect(() => {
+    salvar(estado.clienteId, estado.itens);
+  }, [estado.clienteId, estado.itens]);
 
   const valor = useMemo<ValorDoCarrinho>(
     () => ({
