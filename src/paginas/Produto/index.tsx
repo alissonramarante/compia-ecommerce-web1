@@ -220,6 +220,14 @@ function Produto() {
                 {desconto}% abaixo do preço de tabela
               </span>
             )}
+            {/* Sem o percentual, o valor riscado do kit ficaria sem
+                referência — e há um segundo valor de referência na tela, a
+                soma dos avulsos. Cada um diz o que é. */}
+            {desconto !== null && ehKit && (
+              <span className="font-mono text-xs text-grafite">
+                preço de tabela do kit
+              </span>
+            )}
           </div>
 
           {ultimasUnidades && produto.estoque !== null && (
@@ -289,9 +297,9 @@ function Produto() {
 
               {kitCompensa && (
                 <p className="mt-4 text-sm leading-relaxed text-grafite">
-                  Comprando os três avulsos hoje sairia{' '}
-                  <span className="font-mono text-tinta">{formatarMoeda(kit.soma)}</span>. No
-                  kit são{' '}
+                  A soma dos três avulsos hoje é{' '}
+                  <span className="font-mono text-tinta">{formatarMoeda(kit.soma)}</span>. O
+                  kit sai por{' '}
                   <span className="font-mono text-tinta">{formatarMoeda(preco)}</span> —{' '}
                   <span className="font-mono text-tinta">
                     {formatarMoeda(kit.economia)}
