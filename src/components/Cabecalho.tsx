@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, ShoppingBag, X } from 'lucide-react';
 import { useCarrinho } from '../hooks/useCarrinho';
+import { useSessao } from '../hooks/useSessao';
+import { primeiroNome } from '../lib/sessao';
 
 /**
  * "Categorias" ainda não tem rota própria na especificação: as categorias são
@@ -11,14 +13,21 @@ import { useCarrinho } from '../hooks/useCarrinho';
 const navegacao = [
   { rotulo: 'Catálogo', destino: '/catalogo' },
   { rotulo: 'Categorias', destino: '/catalogo?visao=categorias' },
-  { rotulo: 'Conta', destino: '/conta' },
 ];
 
 function Cabecalho() {
   const [menuAberto, setMenuAberto] = useState(false);
   const { quantidadeTotal } = useCarrinho();
+  const { clienteCorrente } = useSessao();
   const { pathname, search } = useLocation();
   const rotaAtual = `${pathname}${search}`;
+
+  /* "Conta" mostra de quem é a sessão. Com o seletor de cliente da tela de
+     entrar, saber quem está comprando importa mais que o rótulo genérico. */
+  const itensDeNavegacao = [
+    ...navegacao,
+    { rotulo: primeiroNome(clienteCorrente.nome), destino: '/conta' },
+  ];
 
   const classeDoLink = (ativo: boolean) =>
     [
@@ -44,7 +53,7 @@ function Cabecalho() {
         {/* Navegação — 768px para cima */}
         <nav aria-label="Principal" className="hidden md:block">
           <ul className="flex items-center gap-8">
-            {navegacao.map((item) => (
+            {itensDeNavegacao.map((item) => (
               <li key={item.rotulo}>
                 <NavLink to={item.destino} className={classeDoLink(item.destino === rotaAtual)}>
                   {item.rotulo}
@@ -104,7 +113,7 @@ function Cabecalho() {
           className="border-t border-grafite/30 bg-papel md:hidden"
         >
           <ul className="mx-auto max-w-6xl px-4 py-2">
-            {navegacao.map((item) => (
+            {itensDeNavegacao.map((item) => (
               <li key={item.rotulo} className="border-b border-grafite/20 last:border-b-0">
                 <NavLink
                   to={item.destino}
