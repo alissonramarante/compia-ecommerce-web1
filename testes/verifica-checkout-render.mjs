@@ -84,6 +84,7 @@ caso('diz quando venceu', vencido.includes('26/02/2026'));
 caso('oferece gerar nova cobranca', vencido.includes('Gerar nova cobrança'));
 caso('SEM botao de simular pagamento', !vencido.includes('Simular pagamento'));
 caso('SEM bloco de copia e cola', !vencido.includes('PIX copia e cola'));
+caso('SEM QR quando expirada', !/Código PIX de/.test(vencido));
 
 /* ============ 7. pedido: os demais estados ============ */
 secao('pedido — outros estados');
@@ -132,7 +133,11 @@ const emAberto = pedido('CPA-2026-0141', {
 caso('mostra o codigo copia e cola', emAberto.includes('PIX copia e cola'));
 caso('payload num campo copiavel', emAberto.includes('00020126FAKEPAYLOADEMABERTO6304ABCD'));
 caso('campo do payload tem label', emAberto.includes('for="payload-pix"'));
-caso('explica por que nao ha QR', emAberto.includes('um QR incorreto seria pior que nenhum'));
+caso('desenha o QR em SVG', /<svg[^>]*role="img"|<svg[^>]*viewBox/.test(emAberto));
+caso('QR tem titulo acessivel', emAberto.includes('Código PIX de R$ 215,00'));
+caso('QR usa as cores do tema', emAberto.includes('#101418'));
+caso('rotulo do copia e cola', emAberto.includes('PIX copia e cola'));
+caso('avisa que o pagamento nao e aceito', emAberto.includes('nenhum aplicativo de banco vai aceitar'));
 caso('oferece simular pagamento', emAberto.includes('Simular pagamento'));
 caso('diz que nao ha integracao bancaria', emAberto.includes('não tem integração bancária'));
 caso('SEM bloco de expirada', !emAberto.includes('Cobrança expirada'));
