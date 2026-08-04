@@ -228,7 +228,7 @@ export const produtos: Produto[] = [
     peso: 2730,
     imagens: [capa('Kit Trilha\nIA Aplicada')],
     descricao:
-      'Fundamentos de Aprendizado Profundo, Arquitetura de Sistemas Inteligentes e Engenharia de Dados para IA em um único pacote, com 18% de desconto sobre a compra separada.',
+      'Fundamentos de Aprendizado Profundo, Arquitetura de Sistemas Inteligentes e Engenharia de Dados para IA em um único pacote, por menos que a soma dos três avulsos.',
     itensDoKit: ['prod-001', 'prod-002', 'prod-008'],
     destaque: true,
     criadoEm: '2026-02-10T10:00:00Z',

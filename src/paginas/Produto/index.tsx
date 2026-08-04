@@ -80,6 +80,19 @@ function Produto() {
   const kit = economiaDoKit(produtos, produto);
   const semelhantes = relacionados(produtos, produto, LIMITE_DE_RELACIONADOS);
 
+  /* Num kit convivem dois percentuais de significados diferentes: o desconto
+     sobre o preço de tabela do próprio kit e a economia contra comprar os
+     avulsos. Dois "%" na mesma tela viram ruído, e a segunda é a informação
+     que importa em um kit — então aqui o selo genérico some e fica só a
+     comparação, sempre dizendo contra o quê. Na grade do catálogo o selo
+     continua, porque lá não há espaço para a comparação. */
+  const ehKit = produto.tipo === 'kit';
+  const mostrarSeloDePromocao = disponivel && desconto !== null && !ehKit;
+
+  /* Kit sem vantagem não ganha bloco de economia: melhor omitir do que
+     anunciar economia negativa. */
+  const kitCompensa = kit.economia > 0;
+
   /* Fatia 4 */
   const adicionarAoCarrinho = () => {};
 
@@ -143,12 +156,12 @@ function Produto() {
               Esgotado
             </span>
           )}
-          {disponivel && desconto !== null && (
+          {mostrarSeloDePromocao && (
             <span className="absolute left-0 top-0 bg-riso px-2 py-1 font-mono text-[11px] uppercase tracking-wide text-tinta">
               −{desconto}%
             </span>
           )}
-          {disponivel && desconto === null && ultimasUnidades && (
+          {disponivel && !mostrarSeloDePromocao && ultimasUnidades && (
             <span className="absolute left-0 top-0 bg-ocre px-2 py-1 font-mono text-[11px] uppercase tracking-wide text-tinta">
               Últimas unidades
             </span>
@@ -196,14 +209,16 @@ function Produto() {
               {formatarMoeda(preco)}
             </span>
             {desconto !== null && (
-              <>
-                <span className="font-mono text-base text-grafite line-through">
-                  {formatarMoeda(produto.preco)}
-                </span>
-                <span className="font-mono text-sm font-medium text-riso">
-                  economia de {formatarMoeda(produto.preco - preco)} ({desconto}%)
-                </span>
-              </>
+              <span className="font-mono text-base text-grafite line-through">
+                {formatarMoeda(produto.preco)}
+              </span>
+            )}
+            {/* O percentual só aparece quando é o único da tela; no kit ele
+                daria a entender que a economia é contra os avulsos. */}
+            {desconto !== null && !ehKit && (
+              <span className="font-mono text-sm font-medium text-riso">
+                {desconto}% abaixo do preço de tabela
+              </span>
             )}
           </div>
 
@@ -272,15 +287,18 @@ function Produto() {
                 ))}
               </ul>
 
-              <p className="mt-4 text-sm leading-relaxed text-grafite">
-                Comprando separado hoje sairia{' '}
-                <span className="font-mono text-tinta">{formatarMoeda(kit.soma)}</span>. No
-                kit são{' '}
-                <span className="font-mono text-tinta">{formatarMoeda(preco)}</span> —
-                economia de{' '}
-                <span className="font-mono text-tinta">{formatarMoeda(kit.economia)}</span>,
-                ou {kit.percentual}%.
-              </p>
+              {kitCompensa && (
+                <p className="mt-4 text-sm leading-relaxed text-grafite">
+                  Comprando os três avulsos hoje sairia{' '}
+                  <span className="font-mono text-tinta">{formatarMoeda(kit.soma)}</span>. No
+                  kit são{' '}
+                  <span className="font-mono text-tinta">{formatarMoeda(preco)}</span> —{' '}
+                  <span className="font-mono text-tinta">
+                    {formatarMoeda(kit.economia)}
+                  </span>{' '}
+                  a menos, ou {kit.percentual}% abaixo da compra separada.
+                </p>
+              )}
             </section>
           )}
 

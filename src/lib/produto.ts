@@ -74,9 +74,17 @@ export function produtosDoKit(produtos: Produto[], kit: Produto): Produto[] {
  *
  * Kit sem itens devolve tudo zerado, e `percentual` é 0 em vez de NaN.
  *
+ * `economia` pode ser zero ou negativa: nada impede que o kit custe o mesmo
+ * ou mais que os avulsos, sobretudo depois que o admin da Fatia 7 puder
+ * editar preços. A função devolve o número como ele é — quem decide não
+ * exibir vantagem inexistente é a página, que só mostra o bloco quando
+ * `economia > 0`.
+ *
  * Testes de mesa (prod-009 = prod-001 15900 + prod-002 21500 + prod-008 19900):
- *   economiaDoKit(produtos, prod-009) → { soma: 57300, economia: 12400, percentual: 22 }
- *   economiaDoKit(produtos, prod-001) → { soma: 0, economia: 0, percentual: 0 }
+ *   economiaDoKit(produtos, prod-009)        → { soma: 57300, economia: 12400, percentual: 22 }
+ *   economiaDoKit(produtos, prod-001)        → { soma: 0, economia: 0, percentual: 0 }
+ *   kit custando 60000 (acima da soma)       → { soma: 57300, economia: -2700, percentual: -5 }
+ *   kit custando exatamente 57300            → { soma: 57300, economia: 0, percentual: 0 }
  */
 export function economiaDoKit(
   produtos: Produto[],
