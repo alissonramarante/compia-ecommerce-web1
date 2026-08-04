@@ -150,6 +150,11 @@ function lerReaisEmCentavos(valor: string | null): number | undefined {
  * vindo de uma URL escrita à mão é arredondado só na exibição — o filtro em
  * si continua usando o valor exato.
  *
+ * O arredondamento é intencional e não reescreve a URL: o controlador do
+ * campo é semeado com o valor exibido, então sair do campo sem editar nada
+ * não gera escrita. `?precoMax=199,90` continua filtrando em 19990 centavos
+ * mesmo com o campo mostrando 200.
+ *
  * Testes de mesa:
  *   precoEmReais(5000)      → '50'
  *   precoEmReais(19990)     → '200'
