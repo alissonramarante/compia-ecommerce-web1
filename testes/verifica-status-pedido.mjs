@@ -25,6 +25,25 @@ conferir('em_separacao -> entregue (pula etapa)', lib.transicaoValida('em_separa
 conferir('aguardando_pagamento -> pago (automatico, nao manual)', lib.transicaoValida('aguardando_pagamento', 'pago'), false);
 conferir('cancelado -> qualquer coisa', lib.transicaoValida('cancelado', 'pago'), false);
 
+/* Os dois estados terminais não aceitam NENHUMA transição, nem para
+   'cancelado' — a mesma armadilha de "enviado" (estoque devolvido para
+   mercadoria que já saiu) valeria também para 'entregue' se essa transição
+   fosse permitida, e 'cancelado -> cancelado' rodaria devolverEstoque duas
+   vezes se não fosse barrado. */
+conferir('entregue -> cancelado (proibido: mercadoria ja entregue)', lib.transicaoValida('entregue', 'cancelado'), false);
+conferir('entregue -> entregue (terminal, nem para si mesmo)', lib.transicaoValida('entregue', 'entregue'), false);
+conferir('cancelado -> cancelado (terminal, nem para si mesmo)', lib.transicaoValida('cancelado', 'cancelado'), false);
+const TODOS_OS_STATUS = [
+  'aguardando_pagamento',
+  'pago',
+  'em_separacao',
+  'enviado',
+  'pronto_para_retirada',
+  'entregue',
+  'cancelado',
+];
+conferir('nenhum dos sete status transiciona para si mesmo', TODOS_OS_STATUS.every((status) => !lib.transicaoValida(status, status)), true);
+
 /* ============ 3. cancelamentoDevolveEstoque ============ */
 secao('cancelamentoDevolveEstoque');
 conferir('aguardando_pagamento devolve', lib.cancelamentoDevolveEstoque('aguardando_pagamento'), true);
@@ -38,6 +57,7 @@ secao('erroDaMudancaDeStatus');
 conferir('transicao valida sem exigencia extra', lib.erroDaMudancaDeStatus('pago', 'em_separacao'), null);
 conferir('transicao valida para cancelado nao exige rastreio', lib.erroDaMudancaDeStatus('pago', 'cancelado'), null);
 conferir('transicao invalida (entregue e terminal)', typeof lib.erroDaMudancaDeStatus('entregue', 'cancelado'), 'string');
+conferir('transicao invalida (cancelado -> cancelado, ja e terminal)', typeof lib.erroDaMudancaDeStatus('cancelado', 'cancelado'), 'string');
 conferir('enviado sem codigo de rastreio', typeof lib.erroDaMudancaDeStatus('em_separacao', 'enviado'), 'string');
 conferir('enviado com codigo so de espacos', typeof lib.erroDaMudancaDeStatus('em_separacao', 'enviado', { codigoRastreio: '   ' }), 'string');
 conferir('enviado com codigo de rastreio', lib.erroDaMudancaDeStatus('em_separacao', 'enviado', { codigoRastreio: 'BR123456789BR' }), null);
