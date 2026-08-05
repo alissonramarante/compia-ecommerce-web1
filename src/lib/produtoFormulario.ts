@@ -106,6 +106,26 @@ export function gerarSlug(titulo: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+/**
+ * Decide o slug ao digitar um novo título. Sugerir automaticamente vale só
+ * enquanto o campo de slug não foi tocado à mão — ao editar um produto que
+ * já existe, o slug entra tocado desde o começo (é dado publicado, não
+ * rascunho), então mudar o título nunca regenera e quebra
+ * `/produto/algum-slug-publicado`. Regenerar é privilégio de produto novo,
+ * que ainda não tem URL para quebrar.
+ *
+ * Testes de mesa:
+ *   slug ainda não tocado (produto novo)  → sugere a partir do título
+ *   slug já tocado (produto existente, ou editado à mão) → intacto
+ */
+export function proximoSlugAoMudarTitulo(
+  tituloNovo: string,
+  slugAtual: string,
+  slugTocado: boolean,
+): string {
+  return slugTocado ? slugAtual : gerarSlug(tituloNovo);
+}
+
 function paraLista(texto: string): string[] {
   return texto
     .split(',')

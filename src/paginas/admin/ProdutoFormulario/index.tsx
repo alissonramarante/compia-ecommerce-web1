@@ -6,9 +6,9 @@ import { categorias } from '../../../mocks';
 import {
   FORMULARIO_EM_BRANCO,
   gerarIdDeProduto,
-  gerarSlug,
   montarProduto,
   paraDadosDoFormulario,
+  proximoSlugAoMudarTitulo,
   validar,
   type DadosDaFicha,
   type DadosDoFormulario,
@@ -127,7 +127,7 @@ function ProdutoFormulario() {
     setDados((anterior) => ({
       ...anterior,
       titulo: valor,
-      slug: slugTocado ? anterior.slug : gerarSlug(valor),
+      slug: proximoSlugAoMudarTitulo(valor, anterior.slug, slugTocado),
     }));
 
   const aoMudarSlug = (valor: string) => {
@@ -223,12 +223,18 @@ function ProdutoFormulario() {
               onChange={(evento) => aoMudarSlug(evento.target.value)}
               onBlur={() => tocar('slug')}
               aria-invalid={erro('slug') !== undefined}
-              aria-describedby="erro-slug"
+              aria-describedby={editando ? 'erro-slug aviso-slug' : 'erro-slug'}
               className={`${CLASSE_CAMPO} font-mono`}
             />
             <p id="erro-slug" aria-live="polite" className={CLASSE_ERRO}>
               {erro('slug') ?? ''}
             </p>
+            {editando && produtoExistente !== undefined && (
+              <p id="aviso-slug" className="mt-1 text-xs leading-relaxed text-grafite">
+                Já publicado em <span className="font-mono">/produto/{produtoExistente.slug}</span>.
+                Mudar o slug muda esse endereço — links e favoritos antigos param de funcionar.
+              </p>
+            )}
           </div>
 
           <fieldset>

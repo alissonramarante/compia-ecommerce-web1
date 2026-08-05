@@ -15,6 +15,28 @@ conferir('espacos extras colapsam', lib.gerarSlug('  Título   com espaços  '),
 conferir('pontuacao vira hifen unico', lib.gerarSlug('C++: Além do Básico!'), 'c-alem-do-basico');
 conferir('vazio', lib.gerarSlug(''), '');
 
+/* ============ 1b. proximoSlugAoMudarTitulo ============ */
+secao('proximoSlugAoMudarTitulo');
+conferir(
+  'produto novo (slug ainda nao tocado): sugere a partir do titulo',
+  lib.proximoSlugAoMudarTitulo('Fundamentos de Aprendizado Profundo', '', false),
+  'fundamentos-de-aprendizado-profundo',
+);
+conferir(
+  'editar o titulo de um produto existente NAO regenera o slug publicado',
+  lib.proximoSlugAoMudarTitulo(
+    'Fundamentos de Aprendizado Profundo — Edição Revisada',
+    'fundamentos-de-aprendizado-profundo',
+    true,
+  ),
+  'fundamentos-de-aprendizado-profundo',
+);
+conferir(
+  'slug tocado a mao (mesmo em produto novo) tambem para de seguir o titulo',
+  lib.proximoSlugAoMudarTitulo('Outro Titulo Qualquer', 'slug-escolhido-a-mao', true),
+  'slug-escolhido-a-mao',
+);
+
 /* ============ 2. centavosParaReaisTexto ============ */
 secao('centavosParaReaisTexto');
 conferir('15900', lib.centavosParaReaisTexto(15900), '159,00');

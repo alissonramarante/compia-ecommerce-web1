@@ -88,6 +88,15 @@ caso('estoque preenchido', editarFisico.includes('id="produto-estoque"') && edit
 caso('peso preenchido', editarFisico.includes('value="980"'));
 caso('ficha isbn preenchida', editarFisico.includes('978-85-7522-101-4'));
 caso('botao de salvar (nao cadastrar)', editarFisico.includes('Salvar alterações'));
+caso('avisa que o slug ja esta publicado', editarFisico.includes('Já publicado em'));
+caso('aviso cita o endereco atual', editarFisico.includes('/produto/fundamentos-de-aprendizado-profundo'));
+caso('aviso diz que links antigos param de funcionar', editarFisico.includes('links e favoritos antigos param de funcionar'));
+caso('campo do slug referencia o aviso no aria-describedby', editarFisico.includes('aria-describedby="erro-slug aviso-slug"'));
+
+/* ============ 5b. formulário: criar produto novo não avisa sobre slug publicado ============ */
+secao('formulário — novo não tem aviso de slug publicado');
+caso('sem aviso de slug ja publicado (nada para quebrar ainda)', !novo.includes('Já publicado em'));
+caso('campo do slug nao referencia aviso inexistente', novo.includes('aria-describedby="erro-slug"') && !novo.includes('aria-describedby="erro-slug aviso-slug"'));
 
 /* ============ 6. formulário: editar e-book ============ */
 secao('formulário — editar e-book (prod-003)');
