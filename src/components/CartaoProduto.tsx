@@ -103,7 +103,7 @@ function CartaoProduto({ produto }: Props) {
           </div>
 
           {ultimasUnidades && produto.estoque !== null && (
-            <p className="font-mono text-[11px] text-ocre">
+            <p className="font-mono text-[11px] text-ocre-texto">
               {produto.estoque} em estoque
             </p>
           )}

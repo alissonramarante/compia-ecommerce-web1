@@ -116,7 +116,7 @@ function Conta() {
               Pedidos
             </h2>
 
-            <p aria-live="polite" className="mt-2 text-sm leading-relaxed text-ocre">
+            <p aria-live="polite" className="mt-2 text-sm leading-relaxed text-ocre-texto">
               {avisoDaRecompra}
             </p>
 

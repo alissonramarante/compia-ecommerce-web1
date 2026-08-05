@@ -21,6 +21,16 @@ export default {
       riso: '#FF4F7B',
       ocre: '#D9A521',
       grafite: '#5C6670',
+
+      /* Versões escurecidas de riso/ocre, só para `text-*`. `riso` e `ocre`
+         puros não passam de ~2,8:1 sobre papel/white como cor de texto —
+         falham WCAG AA (4.5:1). Estas mantêm a matiz e escurecem até bater
+         4.5:1 contra os dois fundos claros do tema (calculado pela fórmula
+         de luminância relativa, ver CLAUDE.md § Direção visual). Nunca usar
+         como fundo — para isso o acento é o token cheio, com texto tinta
+         por cima. */
+      'riso-texto': '#BE3A5C',
+      'ocre-texto': '#8A6414',
     },
     /* Sobrescreve o borderRadius padrão: o tema inteiro fica limitado a 4px,
        conforme a direção visual. `rounded-full`, `rounded-xl` e afins deixam

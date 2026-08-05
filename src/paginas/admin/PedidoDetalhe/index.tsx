@@ -357,7 +357,7 @@ function PedidoDetalhe() {
                 />
               </div>
 
-              <p role="alert" aria-live="polite" className="min-h-[1.25rem] text-sm text-ocre">
+              <p role="alert" aria-live="polite" className="min-h-[1.25rem] text-sm text-ocre-texto">
                 {erro}
               </p>
 

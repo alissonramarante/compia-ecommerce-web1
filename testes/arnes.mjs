@@ -79,6 +79,56 @@ export function idsSaoUnicos(html) {
   return new Set(ids).size === ids.length;
 }
 
+/**
+ * Tokens de cor do tema — precisa ficar em sincronia com `tailwind.config.js`.
+ * Duplicado aqui de propósito: o config do Tailwind não é importável por um
+ * teste Node puro sem trazer o Tailwind inteiro como dependência de teste, e
+ * o objetivo aqui é validar contraste com a fórmula exata, não estimar.
+ */
+export const TOKENS = {
+  tinta: '#101418',
+  papel: '#EEF0EA',
+  azul: '#23319E',
+  riso: '#FF4F7B',
+  ocre: '#D9A521',
+  grafite: '#5C6670',
+  'riso-texto': '#BE3A5C',
+  'ocre-texto': '#8A6414',
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
+function paraLinear(canal) {
+  const c = canal / 255;
+  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function luminanciaRelativa(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return 0.2126 * paraLinear(r) + 0.7152 * paraLinear(g) + 0.0722 * paraLinear(b);
+}
+
+/**
+ * Razão de contraste WCAG entre duas cores hex — fórmula exata (luminância
+ * relativa + (L1+0.05)/(L2+0.05) com o par ordenado do mais claro pro mais
+ * escuro), não uma estimativa visual.
+ *
+ * Testes de mesa:
+ *   razaoDeContraste('#FFFFFF', '#000000') → 21   (máximo possível)
+ *   razaoDeContraste('#101418', '#EEF0EA') → ~16.1 (tinta sobre papel)
+ *   razaoDeContraste('#FF4F7B', '#EEF0EA') → ~2.75 (riso sobre papel, abaixo do mínimo)
+ *   ordem dos argumentos não importa (comutativa)
+ */
+export function razaoDeContraste(hexA, hexB) {
+  const lA = luminanciaRelativa(hexA);
+  const lB = luminanciaRelativa(hexB);
+  const maisClaro = Math.max(lA, lB);
+  const maisEscuro = Math.min(lA, lB);
+  return (maisClaro + 0.05) / (maisEscuro + 0.05);
+}
+
 /** Placar compartilhado: conta falhas e define o código de saída. */
 export function criarPlacar() {
   let falhas = 0;

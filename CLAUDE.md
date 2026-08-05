@@ -79,8 +79,33 @@ src/
   JSX. Ex.: `AUTOR_COLETIVO` em `lib/produto.ts` — `'Vários autores'` é rótulo,
   não pessoa, e não vira link. Comparação exata, sem normalizar: normalizar
   esconderia inconsistência de cadastro num dado que é controlado.
-- **Despacho é decidido por `peso > 0`, não por `tipo === 'fisico'`.** O kit
-  pesa 2730 g e é despachado. O requisito real é "precisa de entrega física".
+- **ARIA só com o comportamento correspondente.** `role="tablist"` exige
+  navegação por setas, `aria-controls` e `tabindex` gerenciado; sem isso, abas
+  são links com `aria-current="page"`. Atributo sem comportamento é ARIA
+  decorativo e engana o leitor de tela.
+- **Cota de download é por entrada de pedido**, não por produto: comprar o mesmo
+  e-book duas vezes dá duas cotas independentes. Somar ou deduplicar perderia
+  dado do cliente. O consumo persiste — antes de apresentar, rode o reset de
+  demonstração em `/entrar`.
+- **Aviso pertence ao destino da navegação.** O relato de item indisponível na
+  recompra aparece no carrinho, não na conta que foi deixada para trás. Só o
+  caso "nada pôde ser adicionado" fica na origem, porque não há navegação.
+- **Id de item em coleção é atribuído pelo reducer**, a partir de um contador no
+  estado — nunca calculado pelo chamador a partir da lista atual. A ação carrega
+  dados crus e o reducer monta o objeto. Dois `dispatch` no mesmo handler não
+  veem o primeiro (o estado só atualiza no render seguinte), e encadear a lista à
+  mão falha em silêncio com id duplicado. Vale para avisos do carrinho e logs.
+- **Slug é gerado só na criação.** Na edição fica parado até alguém mudá-lo à
+  mão, com aviso de que a URL publicada vai mudar. Regenerar a partir do título
+  quebraria links, favoritos e abas abertas.
+- **Esconder não é proteger.** O menu do admin omite o que o perfil não alcança
+  **e** a rota barra de todo jeito, porque URL é digitável.
+- **Cancelar devolve estoque, exceto em `enviado` e `entregue`** — nesses o
+  produto já saiu fisicamente. `entregue` e `cancelado` são terminais na máquina
+  de transições, e `erroDaMudancaDeStatus` roda antes de qualquer efeito, então
+  clique duplo não infla estoque nem gera log falso.
+- **`/admin/clientes` é somente leitura.** A spec pede acompanhamento, não
+  cadastro. Tudo derivado do `PedidosContext`.
 
 - Nomes de domínio em **português** (`Produto`, `adicionarItem`, `calcularFrete`).
   Nomes de API do React/Tailwind ficam em inglês, como são.
@@ -149,18 +174,31 @@ bem impresso**: metadados em monoespaçada, hierarquia firme, muito branco.
 Tokens (definir em `tailwind.config.js`, usar só estes):
 
 ```
-tinta      #101418   texto e fundo escuro
-papel      #EEF0EA   fundo (levemente frio, não creme)
-azul       #23319E   ações primárias, links
-riso       #FF4F7B   acento único: promoção, badge, foco
-ocre       #D9A521   alertas e estoque baixo
-grafite    #5C6670   texto secundário, bordas
+tinta       #101418   texto e fundo escuro
+papel       #EEF0EA   fundo (levemente frio, não creme)
+azul        #23319E   ações primárias, links
+riso        #FF4F7B   acento único: promoção, badge, foco — só como bg-*
+ocre        #D9A521   alertas e estoque baixo — só como bg-*
+grafite     #5C6670   texto secundário, bordas
+riso-texto  #BE3A5C   riso legível em texto — 4,63:1 sobre papel, 5,32:1 sobre white
+ocre-texto  #8A6414   ocre legível em texto — 4,67:1 sobre papel, 5,37:1 sobre white
 ```
 
 Os tokens **substituem** a paleta do Tailwind, não a estendem: `bg-azul`
 funciona, `bg-azul-500` não existe. Nenhum nome de token deve colidir com uma
 paleta nativa do Tailwind — uma classe inexistente falha em silêncio, sem erro
 de build. Foi por isso que `indigo` virou `azul`.
+
+**Cor saturada preenche, cor escura escreve.** `riso` e `ocre` como `text-*`
+direto sobre `papel` ou `white` não passam de ~2,8:1 — abaixo do mínimo WCAG
+AA (4,5:1 para texto normal, 3:1 para texto grande e componentes de
+interface), calculado pela fórmula de luminância relativa, não estimado. Os
+dois só valem como **preenchimento** (`bg-riso`, `bg-ocre`) com `text-tinta`
+por cima — aí passam de 5,8:1. Para escrever nessa família de cor — erro de
+campo, estoque baixo, indicador de status — use `riso-texto`/`ocre-texto`:
+mesma matiz, escurecida até garantir 4,5:1 contra os dois fundos claros do
+tema. `riso-texto`/`ocre-texto` nunca vão como `bg-*` — são versões escuras
+só para leitura, o contrário anularia o acento.
 
 Tipografia (Google Fonts):
 
@@ -249,10 +287,16 @@ confiável — `localStorage` é editável pelo usuário.
 compia:carrinho:v1:{clienteId}   um carrinho por cliente
 compia:sessao:v1                 só os ids; id inexistente cai no padrão
 compia:pedidos:v1                semeado com os mocks só enquanto vazio
+compia:produtos:v1               idem
+compia:logs:v1                   idem
 ```
 
 Depois da primeira gravação o armazenamento manda sobre os mocks, senão um
 pedido criado no checkout seria engolido pela semente a cada recarga.
+
+**Consequência que confunde no desenvolvimento:** com `compia:produtos:v1`
+gravada, editar `src/mocks/produtos.ts` deixa de refletir na tela. Se um mock
+alterado não aparecer, é isso — rode o reset de demonstração em `/entrar`.
 
 ## Limitações conhecidas (documentar, não consertar)
 
@@ -266,6 +310,9 @@ pedido criado no checkout seria engolido pela semente a cada recarga.
 - **Frete do `ped-003` divergente.** O mock registra R$ 37,36; a fórmula daria
   R$ 52,20. Pedido histórico registra o que foi cobrado e nada recalcula frete
   de pedido existente — fica como está.
+- **Não há fluxo de devolução.** `entregue` e `cancelado` são terminais, e
+  `StatusPagamento.estornado` existe no tipo sem nenhum caminho que o produza.
+  Escolha de escopo, não esquecimento.
 
 **Percentual precisa de referência** quando há mais de uma base de comparação
 na mesma tela, ou quando o número é a afirmação principal. Escreva "16% abaixo
@@ -280,8 +327,8 @@ rotulado.
 1. ~~Scaffold: Vite + TS + Tailwind + tokens + fontes + layout + rotas vazias~~ ✅
 2. ~~Catálogo: grade de produtos, busca, filtros, ordenação~~ ✅
 3. ~~Página do produto + ficha catalográfica~~ ✅
-4. Carrinho + contexto + persistência
+4. ~~Carrinho + contexto + persistência~~ ✅
 5. ~~Checkout: endereço, frete, PIX e cartão, criação do pedido~~ ✅
-6. Área do cliente: pedidos, downloads de e-book
-7. Admin: login por perfil, CRUD de produtos, pedidos, logs
+6. ~~Área do cliente: pedidos, downloads de e-book~~ ✅
+7. ~~Admin: login por perfil, CRUD de produtos, pedidos, logs~~ ✅
 8. Polimento: responsivo, estados vazios, acessibilidade, README

@@ -17,7 +17,7 @@ interface Props {
  * pedido cancelado não é promoção.
  */
 const COR_DO_STATUS: Record<StatusPedido, string> = {
-  aguardando_pagamento: 'text-ocre',
+  aguardando_pagamento: 'text-ocre-texto',
   pago: 'text-tinta',
   em_separacao: 'text-tinta',
   enviado: 'text-tinta',

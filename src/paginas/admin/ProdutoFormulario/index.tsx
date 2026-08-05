@@ -20,7 +20,7 @@ import { useLogs } from '../../../hooks/useLogs';
 
 const CLASSE_ROTULO = 'block font-display text-xs font-bold uppercase tracking-widest text-tinta';
 const CLASSE_CAMPO = 'mt-2 w-full border border-grafite/40 bg-white px-3 py-2 text-sm text-tinta';
-const CLASSE_ERRO = 'mt-1 text-xs text-ocre';
+const CLASSE_ERRO = 'mt-1 text-xs text-ocre-texto';
 const CLASSE_LEGENDA = 'font-display text-xs font-bold uppercase tracking-widest text-tinta';
 const CLASSE_ITEM_CAIXA = 'flex cursor-pointer items-center gap-2 py-1 text-sm text-tinta';
 const CLASSE_CAIXA = 'h-4 w-4 shrink-0 border border-grafite/50 accent-azul';

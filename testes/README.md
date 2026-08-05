@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as vinte e oito em sequência
+npm run testes              # roda as vinte e nove em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -30,6 +30,7 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-produto-formulario` | `lib/produtoFormulario`: `gerarSlug`, `proximoSlugAoMudarTitulo` (editar título não regenera slug publicado), `gerarIdDeProduto`, ida e volta `paraDadosDoFormulario`/`montarProduto`, validação por tipo (físico, e-book, kit), ficha "tudo ou nada", colisão de slug |
 | `verifica-status-pedido` | `lib/statusPedido`: matriz de transições válidas, os dois estados terminais não aceitam nenhuma transição (nem para si mesmos), `enviado` exige código de rastreio, `cancelamentoDevolveEstoque` (sim antes de enviado, não depois), `mudarStatus` grava evento e código de rastreio |
 | `verifica-log` | `lib/log`, `lib/logsArmazenados` e o reducer do `LogsContext`: `criarLog` monta o registro com id sequencial, `filtrarLogs` (ação, usuário, mais recente primeiro), persistência |
+| `verifica-contraste` | Razão de contraste WCAG de cada par de tokens em uso (`arnes.mjs`'s `razaoDeContraste`, fórmula de luminância relativa) — `tinta`/`azul`/`grafite`/`riso-texto`/`ocre-texto` sobre `papel`/`white` ≥4.5:1, `riso`/`ocre` puros continuam abaixo (por isso as versões `-texto` existem), e guarda estrutural: nenhum `text-riso`/`text-ocre` puro sobrou em `src/` |
 | `verifica-render` | Tela do catálogo: contagens, filtros vindos da URL, estado vazio |
 | `verifica-produto-render` | Tela do produto: ficha CIP, selos, kit, e-book, esgotado, slug inexistente |
 | `verifica-carrinho-render` | Tela do carrinho: tabela, resumo, avisos, contador do cabeçalho |

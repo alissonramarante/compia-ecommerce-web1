@@ -178,7 +178,7 @@ function Entrar() {
             <p
               id="erro-da-equipe"
               aria-live="polite"
-              className="mt-2 min-h-[1.25rem] text-sm leading-relaxed text-ocre"
+              className="mt-2 min-h-[1.25rem] text-sm leading-relaxed text-ocre-texto"
             >
               {erro}
             </p>

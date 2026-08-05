@@ -283,7 +283,7 @@ function Produtos() {
                       ) : produto.estoque === 0 ? (
                         <span className="uppercase tracking-wide text-tinta">Esgotado</span>
                       ) : estoqueBaixo(produto) ? (
-                        <span className="font-semibold text-ocre">{produto.estoque}</span>
+                        <span className="font-semibold text-ocre-texto">{produto.estoque}</span>
                       ) : (
                         <span className="text-tinta">{produto.estoque}</span>
                       )}

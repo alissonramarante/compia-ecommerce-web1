@@ -71,7 +71,7 @@ function PassoPagamento({
         <p
           id={`erro-cartao-${nome}`}
           aria-live="polite"
-          className="mt-1 text-xs text-ocre"
+          className="mt-1 text-xs text-ocre-texto"
         >
           {erro ?? ''}
         </p>
