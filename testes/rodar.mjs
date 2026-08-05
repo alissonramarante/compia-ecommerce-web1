@@ -19,6 +19,7 @@ const SUITES = [
   ['catalogo', 'verifica-catalogo.mjs', 'lib/catalogo: filtro, ordenação, URL'],
   ['debounce', 'verifica-debounce.mjs', 'lib/campoDebounced: histórico'],
   ['produto', 'verifica-produto.mjs', 'lib/produto: kit, relacionados, ficha'],
+  ['produtos', 'verifica-produtos.mjs', 'lib/produto (estoque) + produtosArmazenados + reducer'],
   ['carrinho', 'verifica-carrinho.mjs', 'lib/carrinho + persistência + reducer'],
   ['sessao', 'verifica-sessao.mjs', 'lib/sessao + persistência + reducer'],
   ['frete', 'verifica-frete.mjs', 'lib/frete: CEP, faixas, gratuidade'],

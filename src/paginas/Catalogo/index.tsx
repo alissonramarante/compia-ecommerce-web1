@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { categorias, produtos } from '../../mocks';
+import { categorias } from '../../mocks';
 import {
   contarFiltrosAtivos,
   contarPorCategoria,
@@ -8,6 +8,7 @@ import {
   lerFiltrosDaUrl,
   ordenarProdutos,
 } from '../../lib/catalogo';
+import { useProdutos } from '../../hooks/useProdutos';
 import CampoBusca from '../../components/CampoBusca';
 import CartaoProduto from '../../components/CartaoProduto';
 import FiltrosCatalogo from '../../components/FiltrosCatalogo';
@@ -21,6 +22,7 @@ import SemResultados from '../../components/SemResultados';
  */
 function Catalogo() {
   const [parametros, setParametros] = useSearchParams();
+  const { produtos } = useProdutos();
 
   /* 1. Leitura — a URL é a única fonte de verdade dos filtros. */
   const filtros = lerFiltrosDaUrl(parametros);

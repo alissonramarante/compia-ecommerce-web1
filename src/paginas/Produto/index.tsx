@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { categorias, produtos } from '../../mocks';
+import { categorias } from '../../mocks';
 import {
   estaDisponivel,
   estoqueBaixo,
@@ -20,6 +20,7 @@ import {
 import { formatarMoeda } from '../../lib/formatadores';
 import { mensagemDeAdicao } from '../../lib/carrinho';
 import { useCarrinho } from '../../hooks/useCarrinho';
+import { useProdutos } from '../../hooks/useProdutos';
 import { useSinalTemporario } from '../../hooks/useSinalTemporario';
 import BotaoAdicionarAoCarrinho from '../../components/BotaoAdicionarAoCarrinho';
 import CartaoProduto from '../../components/CartaoProduto';
@@ -33,6 +34,7 @@ const CLASSE_SUBTITULO_DE_BLOCO =
 
 function Produto() {
   const { slug } = useParams();
+  const { produtos } = useProdutos();
   const produto = buscarPorSlug(produtos, slug ?? '');
   const [quantidade, setQuantidade] = useState(1);
   const { adicionar, quantidadeTotal } = useCarrinho();

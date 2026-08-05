@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { localDeRetirada, produtos } from '../../mocks';
+import { localDeRetirada } from '../../mocks';
 import { cobrancaExpirada } from '../../lib/pagamento';
 import { ROTULO_DE_STATUS, aplicarPagamento, renovarCobrancaPix } from '../../lib/pedido';
 import { formatarCep, formatarData, formatarMoeda } from '../../lib/formatadores';
 import { usePedidos } from '../../hooks/usePedidos';
+import { useProdutos } from '../../hooks/useProdutos';
 import CobrancaPix from '../../components/CobrancaPix';
 
 const CLASSE_TITULO =
@@ -14,6 +15,7 @@ const CLASSE_TITULO =
 function Pedido() {
   const { numero } = useParams();
   const { pedidoPorNumero, atualizarPedido } = usePedidos();
+  const { produtos } = useProdutos();
 
   /* Fronteira do relógio, congelada na montagem: é o que decide se a
      cobrança PIX já venceu. As ações usam a hora do clique. */

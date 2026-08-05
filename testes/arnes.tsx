@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import SessaoProvider from '../src/contexts/SessaoContext.tsx';
 import PedidosProvider from '../src/contexts/PedidosContext.tsx';
+import ProdutosProvider from '../src/contexts/ProdutosContext.tsx';
 import CarrinhoProvider from '../src/contexts/CarrinhoContext.tsx';
 import Layout from '../src/components/Layout.tsx';
 
@@ -34,6 +35,8 @@ interface Opcoes {
   carrinhos?: Record<string, unknown[]>;
   /** Semeia `compia:pedidos:v1`. Ausente usa a semente dos mocks. */
   pedidos?: unknown[];
+  /** Semeia `compia:produtos:v1`. Ausente usa a semente dos mocks. */
+  produtos?: unknown[];
   /** Grava chaves cruas, para testar conteúdo corrompido ou o formato antigo. */
   bruto?: Record<string, string>;
   /** `localStorage` inexistente (SSR). */
@@ -75,6 +78,10 @@ function prepararArmazenamento(opcoes: Opcoes): void {
 
   if (opcoes.pedidos !== undefined) {
     dados['compia:pedidos:v1'] = JSON.stringify(opcoes.pedidos);
+  }
+
+  if (opcoes.produtos !== undefined) {
+    dados['compia:produtos:v1'] = JSON.stringify(opcoes.produtos);
   }
 
   Object.assign(dados, opcoes.bruto ?? {});
@@ -119,11 +126,13 @@ export function renderizarComProvedores(rota: string, opcoes: Opcoes = {}): stri
   return renderToStaticMarkup(
     <SessaoProvider>
       <PedidosProvider>
-        <CarrinhoProvider>
-          <MemoryRouter initialEntries={[rota]}>
-            <Routes>{rotas}</Routes>
-          </MemoryRouter>
-        </CarrinhoProvider>
+        <ProdutosProvider>
+          <CarrinhoProvider>
+            <MemoryRouter initialEntries={[rota]}>
+              <Routes>{rotas}</Routes>
+            </MemoryRouter>
+          </CarrinhoProvider>
+        </ProdutosProvider>
       </PedidosProvider>
     </SessaoProvider>,
   );

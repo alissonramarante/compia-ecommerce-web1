@@ -169,3 +169,42 @@ export function limitarQuantidade(valor: number, maximo: number | null): number 
   if (maximo === null) return comPiso;
   return Math.max(1, Math.min(comPiso, maximo));
 }
+
+/* ------------------------------------------------------------------ */
+/* 5. Estoque                                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Reduz o estoque numérico dos produtos comprados. E-book (`estoque: null`)
+ * não muda — não há o que baixar. Nunca fica negativo: comprar mais do que o
+ * estoque atual apenas zera, não é uma inconsistência a sinalizar aqui.
+ *
+ * Produto fora da lista de itens comprados sai intacto.
+ *
+ * Testes de mesa (prod-002 estoque 7, prod-003 e-book estoque null, prod-006
+ * estoque 3):
+ *   baixarEstoque(produtos, [{produtoId:'prod-002', quantidade:3}])
+ *     → prod-002.estoque 4, demais intactos
+ *   baixarEstoque(produtos, [{produtoId:'prod-003', quantidade:1}])
+ *     → prod-003.estoque continua null
+ *   baixarEstoque(produtos, [{produtoId:'prod-006', quantidade:99}])
+ *     → prod-006.estoque 0, nunca negativo
+ *   baixarEstoque(produtos, [{produtoId:'zzz', quantidade:1}])
+ *     → produtos intactos, item fantasma ignorado
+ *   baixarEstoque(produtos, [])
+ *     → produtos intactos
+ *   não muta o array nem os produtos recebidos
+ */
+export function baixarEstoque(
+  produtos: Produto[],
+  itens: { produtoId: string; quantidade: number }[],
+): Produto[] {
+  return produtos.map((produto) => {
+    if (produto.estoque === null) return produto;
+
+    const item = itens.find((candidato) => candidato.produtoId === produto.id);
+    if (item === undefined) return produto;
+
+    return { ...produto, estoque: Math.max(0, produto.estoque - item.quantidade) };
+  });
+}

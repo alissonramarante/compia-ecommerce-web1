@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 
-import { produtos } from '../../mocks';
 import { linhasDoCarrinho, pesoTotal, totalDaLinha } from '../../lib/carrinho';
 import { formatarMoeda } from '../../lib/formatadores';
 import { useCarrinho } from '../../hooks/useCarrinho';
+import { useProdutos } from '../../hooks/useProdutos';
 import SeletorQuantidade from '../../components/SeletorQuantidade';
 
 const CLASSE_CABECALHO_DE_COLUNA =
@@ -20,6 +20,7 @@ function Carrinho() {
     alterarQuantidade,
     descartarAviso,
   } = useCarrinho();
+  const { produtos } = useProdutos();
 
   const linhas = linhasDoCarrinho(itens, produtos);
   const peso = pesoTotal(itens, produtos);

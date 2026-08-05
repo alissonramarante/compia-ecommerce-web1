@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import type { Endereco, Entrega, MetodoPagamento, ModalidadeEntrega } from '../../types';
-import { localDeRetirada, produtos } from '../../mocks';
+import { localDeRetirada } from '../../mocks';
 import { linhasDoCarrinho, pesoTotal } from '../../lib/carrinho';
 import { calcularFrete } from '../../lib/frete';
 import {
@@ -32,6 +32,7 @@ import { aplicarPagamento, criarPedido, gerarNumeroPedido } from '../../lib/pedi
 import { enderecoPrincipal } from '../../lib/sessao';
 import { useCarrinho } from '../../hooks/useCarrinho';
 import { usePedidos } from '../../hooks/usePedidos';
+import { useProdutos } from '../../hooks/useProdutos';
 import { useSessao } from '../../hooks/useSessao';
 import PassoConfirmacao from '../../components/PassoConfirmacao';
 import PassoEndereco from '../../components/PassoEndereco';
@@ -66,6 +67,7 @@ function Checkout() {
   const { clienteCorrente } = useSessao();
   const { itens, subtotal, limpar, avisar } = useCarrinho();
   const { pedidos, adicionarPedido } = usePedidos();
+  const { produtos } = useProdutos();
 
   /* Fronteira do relógio. Congelado na montagem: a validação de validade de
      cartão compara mês, e um valor que muda a cada render só criaria ruído.

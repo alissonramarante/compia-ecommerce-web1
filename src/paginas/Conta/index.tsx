@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import type { FormatoEbook } from '../../types';
-import { produtos } from '../../mocks';
 import {
   ABAS,
   AVISO_DE_RECOMPRA_IMPOSSIVEL,
@@ -16,6 +15,7 @@ import { cobrancaExpirada } from '../../lib/pagamento';
 import { formatarCep, formatarCpf, mascararCpf } from '../../lib/formatadores';
 import { useCarrinho } from '../../hooks/useCarrinho';
 import { usePedidos } from '../../hooks/usePedidos';
+import { useProdutos } from '../../hooks/useProdutos';
 import { useSessao } from '../../hooks/useSessao';
 import LinhaDePedido from '../../components/LinhaDePedido';
 import ListaDeDownloads from '../../components/ListaDeDownloads';
@@ -29,6 +29,7 @@ function Conta() {
   const { clienteCorrente, usuarioCorrente } = useSessao();
   const { pedidosDoCliente, atualizarPedido, pedidos } = usePedidos();
   const { adicionar, avisar } = useCarrinho();
+  const { produtos } = useProdutos();
 
   /* Fronteira do relógio, congelada na montagem: decide o que é cobrança em
      aberto e o que já venceu. */

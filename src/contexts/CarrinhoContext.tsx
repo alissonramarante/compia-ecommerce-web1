@@ -1,7 +1,7 @@
 import { createContext, useEffect, useMemo, useReducer, type ReactNode } from 'react';
 
 import type { ItemCarrinho, Produto } from '../types';
-import { produtos } from '../mocks';
+import { produtos as produtosDosMocks } from '../mocks';
 import {
   adicionarItem,
   alterarQuantidade,
@@ -12,6 +12,7 @@ import {
 } from '../lib/carrinho';
 import { carregarReconciliado, salvar } from '../lib/carrinhoArmazenado';
 import { useSessao } from '../hooks/useSessao';
+import { useProdutos } from '../hooks/useProdutos';
 
 export interface Aviso {
   id: string;
@@ -112,8 +113,18 @@ function comIds(textos: string[]): Aviso[] {
   return textos.map((texto, indice) => ({ id: `aviso-${indice}`, texto }));
 }
 
-/** Carga inicial do cliente corrente. */
-export function criarEstadoInicial(clienteId: string): EstadoCarrinho {
+/**
+ * Carga inicial do cliente corrente.
+ *
+ * `produtos` tem o catálogo dos mocks como padrão para quem chama a função
+ * fora do `<CarrinhoProvider>` — as suítes de teste, que reconciliam contra
+ * o catálogo real. Em tempo de execução o provider passa o catálogo vivo do
+ * `ProdutosContext`, para refletir estoque e preço já editados no admin.
+ */
+export function criarEstadoInicial(
+  clienteId: string,
+  produtos: Produto[] = produtosDosMocks,
+): EstadoCarrinho {
   const { itens, avisos } = carregarReconciliado(produtos, clienteId);
 
   return {
@@ -146,14 +157,18 @@ interface Props {
 
 function CarrinhoProvider({ children }: Props) {
   const { clienteCorrente } = useSessao();
+  const { produtos } = useProdutos();
   const [estado, despachar] = useReducer(
     reducerCarrinho,
     clienteCorrente.id,
-    criarEstadoInicial,
+    (clienteId) => criarEstadoInicial(clienteId, produtos),
   );
 
   /* Troca de cliente: carrega o carrinho do novo. A leitura acontece aqui,
-     na fronteira, e o reducer só recebe o resultado pronto. */
+     na fronteira, e o reducer só recebe o resultado pronto.
+     Também dispara quando o catálogo muda com o mesmo cliente logado — é o
+     que faz a reconciliação reagir a um estoque ou preço editado no admin
+     enquanto o carrinho de outro cliente está aberto. */
   useEffect(() => {
     if (estado.clienteId === clienteCorrente.id) return;
 
@@ -164,7 +179,7 @@ function CarrinhoProvider({ children }: Props) {
       itens,
       avisos: comIds(avisos),
     });
-  }, [clienteCorrente.id, estado.clienteId]);
+  }, [clienteCorrente.id, estado.clienteId, produtos]);
 
   /* Grava sempre sob a chave do dono guardado no estado, nunca sob a da
      sessão: no render em que o cliente muda, o estado ainda é o do anterior,

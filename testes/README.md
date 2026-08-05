@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as dezessete em sequência
+npm run testes              # roda as dezoito em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -17,6 +17,7 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-catalogo` | `lib/catalogo`: filtro, ordenação, busca sem acento, leitura da URL, contagem por categoria |
 | `verifica-debounce` | `lib/campoDebounced`: digitar não empilha histórico, Enter/blur empilha, escrita sem mudança é descartada |
 | `verifica-produto` | `lib/produto`: kit, economia, relacionados, quantidade, `AUTOR_COLETIVO` |
+| `verifica-produtos` | `lib/produto` (`baixarEstoque`), `lib/produtosArmazenados` e o reducer do `ProdutosContext`: nunca fica negativo, e-book intocado, upsert por id, carga inicial |
 | `verifica-carrinho` | `lib/carrinho`, `lib/carrinhoArmazenado` e o reducer: limites, `localStorage` hostil, reconciliação, carrinho por cliente, migração da chave antiga |
 | `verifica-sessao` | `lib/sessao`, `lib/sessaoArmazenada` e o reducer: acesso da equipe, conta inativa, resolução contra os mocks |
 | `verifica-frete` | `lib/frete`: validação de CEP, faixas, arredondamento por quilo, frete grátis não contaminando o expresso |
