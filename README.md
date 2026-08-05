@@ -105,7 +105,8 @@ Um roteiro sugerido para conhecer a loja de ponta a ponta:
 3. **Carrinho e checkout**, em quatro passos: endereço (ou retirada na sede),
    frete calculado pela faixa do CEP, forma de pagamento, e confirmação.
    - **Dados de teste para pagamento**: qualquer número de cartão válido pelo
-     algoritmo de Luhn é aprovado — por exemplo, `4539 5787 6362 1486`.
+     algoritmo de Luhn é aprovado — por exemplo, `4539 5787 6362 1486`
+     (bandeira Visa).
      `4000 0000 0000 0002` é sempre recusado, para testar o fluxo de erro.
      Use qualquer validade futura (formato MM/AA) e CVV de 3 dígitos (4 para
      cartões Amex, que começam com 34 ou 37).

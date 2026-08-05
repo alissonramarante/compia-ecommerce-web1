@@ -33,6 +33,7 @@ const SUITES = [
   ['status-pedido', 'verifica-status-pedido.mjs', 'lib/statusPedido: máquina de transições, estoque no cancelamento'],
   ['log', 'verifica-log.mjs', 'lib/log + logsArmazenados + reducer'],
   ['contraste', 'verifica-contraste.mjs', 'contraste WCAG dos tokens de cor, calculado'],
+  ['readme', 'verifica-readme.mjs', 'dados de teste de pagamento citados no README funcionam de verdade'],
   ['catalogo (tela)', 'verifica-render.mjs', 'renderização do catálogo'],
   ['produto (tela)', 'verifica-produto-render.mjs', 'renderização do produto'],
   ['carrinho (tela)', 'verifica-carrinho-render.mjs', 'renderização do carrinho'],
