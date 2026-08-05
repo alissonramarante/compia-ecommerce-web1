@@ -58,6 +58,27 @@ export async function carregarArnes() {
   return exigir(saida);
 }
 
+/**
+ * Confere se todo `id="..."` de um HTML renderizado é único — o defeito da
+ * Fatia 4 (dois campos com o mesmo id, `<label>` associado ao errado) não
+ * pode voltar.
+ *
+ * A fronteira de palavra antes de `id=` importa: sem ela, `aria-invalid`,
+ * `aria-describedby` etc. combinam pela cauda (`...val`**`id="false"`**`...`)
+ * e o valor de um atributo booleano vira uma "colisão de id" inventada.
+ *
+ * Testes de mesa:
+ *   um só id                                    → true
+ *   dois ids diferentes                         → true
+ *   aria-invalid="false" sem id repetido de verdade → true (não é falso positivo)
+ *   dois `id="mesmo"`                            → false
+ *   id repetido escondido atrás de aria-describedby → false (detecta mesmo com atributo-armadilha no meio)
+ */
+export function idsSaoUnicos(html) {
+  const ids = html.match(/(?<![a-zA-Z-])id="[^"]+"/g) ?? [];
+  return new Set(ids).size === ids.length;
+}
+
 /** Placar compartilhado: conta falhas e define o código de saída. */
 export function criarPlacar() {
   let falhas = 0;

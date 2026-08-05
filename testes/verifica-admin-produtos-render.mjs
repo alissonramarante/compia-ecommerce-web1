@@ -1,4 +1,4 @@
-import { carregarArnes, criarPlacar } from './arnes.mjs';
+import { carregarArnes, criarPlacar, idsSaoUnicos } from './arnes.mjs';
 
 const { renderizarComProvedores } = await carregarArnes();
 const { caso, secao, encerrar } = criarPlacar();
@@ -8,6 +8,20 @@ const VENDEDOR = { clienteId: 'cli-001', usuarioId: 'usr-003' }; // Cláudia, ve
 const EDITOR = { clienteId: 'cli-001', usuarioId: 'usr-002' }; // Gustavo, editor
 
 const pagina = (rota, sessao = ADMIN) => renderizarComProvedores(rota, { sessao });
+
+/* ============ 0. autoteste — idsSaoUnicos não é enganado nem cego ============ */
+secao('autoteste — idsSaoUnicos');
+caso('um id so: unico', idsSaoUnicos('<input id="produto-titulo" />'));
+caso('dois ids diferentes: unico', idsSaoUnicos('<input id="a" /><input id="b" />'));
+caso(
+  'aria-invalid="false" nao e falso-positivo de id repetido',
+  idsSaoUnicos('<input id="x" aria-invalid="false" /><input id="y" aria-invalid="false" />'),
+);
+caso('DETECTA duplicata de verdade', !idsSaoUnicos('<input id="dup" /><input id="dup" />'));
+caso(
+  'detecta duplicata mesmo com aria-describedby no meio (regressão do bug do aria-invalid)',
+  !idsSaoUnicos('<input id="dup" aria-invalid="true" aria-describedby="erro-dup" /><input id="dup" />'),
+);
 
 /* ============ 1. lista: conteúdo derivado do catálogo ============ */
 secao('lista — conteúdo');
@@ -60,7 +74,7 @@ caso('nao mostra formatos (so ebook)', !novo.includes('id="produto-formato-pdf"'
 caso('nao mostra itens do kit (so kit)', !novo.includes('Itens do kit'));
 caso('erros comecam vazios (nada tocado)', /id="erro-titulo"[^>]*>\s*<\/p>/.test(novo));
 caso('botao de cadastrar', novo.includes('Cadastrar produto'));
-caso('sem ids repetidos', (() => { const ids = novo.match(/(?<![a-zA-Z-])id="[^"]+"/g) || []; return new Set(ids).size === ids.length; })());
+caso('sem ids repetidos', idsSaoUnicos(novo));
 
 /* ============ 5. formulário: editar físico ============ */
 secao('formulário — editar físico (prod-001)');
