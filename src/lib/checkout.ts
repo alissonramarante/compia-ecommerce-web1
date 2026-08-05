@@ -1,4 +1,5 @@
 import type { Endereco, MetodoPagamento, ModalidadeEntrega } from '../types';
+import { mensagemDeResumoDeErros } from './formatadores';
 import { validarCep } from './frete';
 import {
   detectarBandeira,
@@ -289,3 +290,30 @@ export function mensagemDeCheckoutAbortado(nomeDoCliente: string): string {
 /** Recusa do cartão. Diz o que fazer, não só que deu errado. */
 export const ERRO_DE_CARTAO_RECUSADO =
   'Cartão recusado pela operadora. Confira os dados, tente outro cartão ou pague com PIX. Nada foi cobrado e seu carrinho continua intacto.';
+
+export const ERRO_FRETE_NAO_ESCOLHIDO = 'Escolha uma opção de frete para continuar.';
+export const ERRO_PAGAMENTO_NAO_ESCOLHIDO = 'Escolha uma forma de pagamento para continuar.';
+
+/**
+ * Texto da região viva única do checkout quando `avancar` bloqueia a
+ * transição de passo. Frete e meio de pagamento não têm campo — não há o
+ * que contar — por isso caem num aviso fixo em vez de um resumo numérico.
+ *
+ * Testes de mesa:
+ *   pendente 1, 3 erros de endereço      → '3 campos precisam de correção'
+ *   pendente 2                            → ERRO_FRETE_NAO_ESCOLHIDO
+ *   pendente 3, metodo nulo               → ERRO_PAGAMENTO_NAO_ESCOLHIDO
+ *   pendente 3, metodo cartão, 2 erros    → '2 campos precisam de correção'
+ */
+export function mensagemDePassoBloqueado(
+  pendente: Passo,
+  metodo: MetodoPagamento | null,
+  quantidadeDeErrosDeEndereco: number,
+  quantidadeDeErrosDeCartao: number,
+): string {
+  if (pendente === 1) return mensagemDeResumoDeErros(quantidadeDeErrosDeEndereco);
+  if (pendente === 2) return ERRO_FRETE_NAO_ESCOLHIDO;
+  if (metodo === 'cartao') return mensagemDeResumoDeErros(quantidadeDeErrosDeCartao);
+
+  return ERRO_PAGAMENTO_NAO_ESCOLHIDO;
+}

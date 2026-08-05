@@ -149,3 +149,19 @@ export function formatarCpf(cpf: string): string {
 
   return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
 }
+
+/**
+ * Resumo plural para a região viva única de erro de formulário — a única
+ * coisa que ela anuncia, além de mudanças sem campo dono. Erro de campo
+ * mesmo é anunciado por `aria-describedby`, ao receber foco.
+ *
+ * Testes de mesa:
+ *   mensagemDeResumoDeErros(0) → '0 campos precisam de correção'
+ *   mensagemDeResumoDeErros(1) → '1 campo precisa de correção'
+ *   mensagemDeResumoDeErros(3) → '3 campos precisam de correção'
+ */
+export function mensagemDeResumoDeErros(quantidade: number): string {
+  return quantidade === 1
+    ? '1 campo precisa de correção'
+    : `${quantidade} campos precisam de correção`;
+}

@@ -26,7 +26,10 @@ caso('endereco vem pre-preenchido do cliente', p1.includes('value="58429-140"'))
 caso('logradouro pre-preenchido', p1.includes('value="Rua Aprígio Veloso"'));
 caso('escolha de modalidade', p1.includes('Entrega no meu endereço') && p1.includes('Retirar na sede da editora'));
 caso('todo campo tem label', p1.includes('for="endereco-cep"') && p1.includes('for="endereco-uf"'));
-caso('erros em regiao aria-live', (p1.match(/aria-live="polite"/g) ?? []).length >= 6);
+/* Erro de campo é anunciado por aria-describedby ao receber foco, não por
+   região viva própria — só existe uma região viva por página, o resumo. */
+caso('so uma regiao aria-live na pagina (resumo unico)', (p1.match(/aria-live="polite"/g) ?? []).length === 1);
+caso('cada campo tem id proprio para aria-describedby', p1.includes('id="erro-cep"') && p1.includes('id="erro-uf"'));
 caso('sem erro visivel antes de tocar', !p1.includes('CEP inválido'));
 caso('botao continuar', p1.includes('Continuar'));
 caso('volta para o carrinho no primeiro passo', p1.includes('Voltar ao carrinho'));
@@ -63,6 +66,7 @@ secao('checkout — só e-book');
 const ebook = checkout('', EBOOK);
 caso('pula direto para o pagamento', ebook.includes('>Pagamento</h2>'));
 caso('avisa por que pulou', ebook.includes('Pedido só com e-book') && ebook.includes('não há endereço nem frete'));
+caso('passo de pagamento tambem so tem a regiao unica da pagina', (ebook.match(/aria-live="polite"/g) ?? []).length === 1);
 caso('trilha so tem 2 passos', (ebook.match(/Etapas do checkout/g) ?? []).length === 1 && !ebook.includes('Endereço e entrega'));
 caso('sem passo de frete', !ebook.includes('>Frete</h2>'));
 caso('?passo=1 num pedido de e-book cai no pagamento', checkout('?passo=1', EBOOK).includes('>Pagamento</h2>'));

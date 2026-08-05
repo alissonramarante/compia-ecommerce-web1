@@ -14,6 +14,7 @@ import {
   type DadosDoFormulario,
   type ErrosDoFormulario,
 } from '../../../lib/produtoFormulario';
+import { mensagemDeResumoDeErros } from '../../../lib/formatadores';
 import { useProdutos } from '../../../hooks/useProdutos';
 import { useSessao } from '../../../hooks/useSessao';
 import { useLogs } from '../../../hooks/useLogs';
@@ -198,7 +199,7 @@ function ProdutoFormulario() {
               aria-describedby="erro-titulo"
               className={CLASSE_CAMPO}
             />
-            <p id="erro-titulo" aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-titulo" className={CLASSE_ERRO}>
               {erro('titulo') ?? ''}
             </p>
           </div>
@@ -229,7 +230,7 @@ function ProdutoFormulario() {
               aria-describedby="erro-autores"
               className={CLASSE_CAMPO}
             />
-            <p id="erro-autores" aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-autores" className={CLASSE_ERRO}>
               {erro('autores') ?? ''}
             </p>
           </div>
@@ -247,7 +248,7 @@ function ProdutoFormulario() {
               aria-describedby={editando ? 'erro-slug aviso-slug' : 'erro-slug'}
               className={`${CLASSE_CAMPO} font-mono`}
             />
-            <p id="erro-slug" aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-slug" className={CLASSE_ERRO}>
               {erro('slug') ?? ''}
             </p>
             {editando && produtoExistente !== undefined && (
@@ -361,7 +362,7 @@ function ProdutoFormulario() {
                 aria-describedby="erro-preco"
                 className={`${CLASSE_CAMPO} font-mono`}
               />
-              <p id="erro-preco" aria-live="polite" className={CLASSE_ERRO}>
+              <p id="erro-preco" className={CLASSE_ERRO}>
                 {erro('preco') ?? ''}
               </p>
             </div>
@@ -381,7 +382,7 @@ function ProdutoFormulario() {
                 aria-describedby="erro-preco-promo"
                 className={`${CLASSE_CAMPO} font-mono`}
               />
-              <p id="erro-preco-promo" aria-live="polite" className={CLASSE_ERRO}>
+              <p id="erro-preco-promo" className={CLASSE_ERRO}>
                 {erro('precoPromocional') ?? ''}
               </p>
             </div>
@@ -403,13 +404,15 @@ function ProdutoFormulario() {
                       tocar('formatos');
                       atualizar({ formatos: alternarEmLista(dados.formatos, formato.valor) });
                     }}
+                    aria-invalid={erro('formatos') !== undefined}
+                    aria-describedby="erro-formatos"
                     className={CLASSE_CAIXA}
                   />
                   {formato.rotulo}
                 </label>
               ))}
             </div>
-            <p aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-formatos" className={CLASSE_ERRO}>
               {erro('formatos') ?? ''}
             </p>
           </fieldset>
@@ -431,7 +434,7 @@ function ProdutoFormulario() {
                   aria-describedby="erro-estoque"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
-                <p id="erro-estoque" aria-live="polite" className={CLASSE_ERRO}>
+                <p id="erro-estoque" className={CLASSE_ERRO}>
                   {erro('estoque') ?? ''}
                 </p>
               </div>
@@ -450,7 +453,7 @@ function ProdutoFormulario() {
                   aria-describedby="erro-peso"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
-                <p id="erro-peso" aria-live="polite" className={CLASSE_ERRO}>
+                <p id="erro-peso" className={CLASSE_ERRO}>
                   {erro('peso') ?? ''}
                 </p>
               </div>
@@ -476,6 +479,8 @@ function ProdutoFormulario() {
                             tocar('itensDoKit');
                             atualizar({ itensDoKit: alternarEmLista(dados.itensDoKit, produto.id) });
                           }}
+                          aria-invalid={erro('itensDoKit') !== undefined}
+                          aria-describedby="erro-itens-kit"
                           className={CLASSE_CAIXA}
                         />
                         {produto.titulo}
@@ -485,7 +490,7 @@ function ProdutoFormulario() {
                   </li>
                 ))}
             </ul>
-            <p aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-itens-kit" className={CLASSE_ERRO}>
               {erro('itensDoKit') ?? ''}
             </p>
           </fieldset>
@@ -509,6 +514,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.isbn}
                   onChange={(evento) => atualizarFicha({ isbn: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
               </div>
@@ -521,6 +528,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.edicao}
                   onChange={(evento) => atualizarFicha({ edicao: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={CLASSE_CAMPO}
                 />
               </div>
@@ -534,6 +543,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.anoTexto}
                   onChange={(evento) => atualizarFicha({ anoTexto: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
               </div>
@@ -547,6 +558,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.paginasTexto}
                   onChange={(evento) => atualizarFicha({ paginasTexto: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
               </div>
@@ -559,6 +572,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.idioma}
                   onChange={(evento) => atualizarFicha({ idioma: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={CLASSE_CAMPO}
                 />
               </div>
@@ -571,6 +586,8 @@ function ProdutoFormulario() {
                   value={dados.ficha.cdu}
                   onChange={(evento) => atualizarFicha({ cdu: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={`${CLASSE_CAMPO} font-mono`}
                 />
               </div>
@@ -583,11 +600,13 @@ function ProdutoFormulario() {
                   value={dados.ficha.editora}
                   onChange={(evento) => atualizarFicha({ editora: evento.target.value })}
                   onBlur={() => tocar('ficha')}
+                  aria-invalid={erro('ficha') !== undefined}
+                  aria-describedby="erro-ficha"
                   className={CLASSE_CAMPO}
                 />
               </div>
             </div>
-            <p aria-live="polite" className={CLASSE_ERRO}>
+            <p id="erro-ficha" className={CLASSE_ERRO}>
               {erro('ficha') ?? ''}
             </p>
           </fieldset>
@@ -609,7 +628,7 @@ function ProdutoFormulario() {
 
         {tentouSalvar && Object.keys(erros).length > 0 && (
           <p role="alert" className="border-l-2 border-ocre bg-white px-4 py-3 text-sm leading-relaxed text-tinta">
-            Há campos para corrigir antes de salvar.
+            {mensagemDeResumoDeErros(Object.keys(erros).length)}
           </p>
         )}
 

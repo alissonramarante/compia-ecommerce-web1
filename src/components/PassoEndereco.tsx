@@ -59,7 +59,7 @@ function PassoEndereco({
           aria-describedby={erro !== undefined ? `erro-${nome}` : undefined}
           className={CLASSE_CAMPO}
         />
-        <p id={`erro-${nome}`} aria-live="polite" className="mt-1 text-xs text-ocre-texto">
+        <p id={`erro-${nome}`} className="mt-1 text-xs text-ocre-texto">
           {erro ?? ''}
         </p>
       </div>

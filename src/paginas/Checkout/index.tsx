@@ -21,6 +21,7 @@ import {
   formatarNumeroDeCartao,
   formatarValidade,
   mensagemDeCheckoutAbortado,
+  mensagemDePassoBloqueado,
   passoPermitido,
   passosVisiveis,
   primeiroPassoPendente,
@@ -86,6 +87,9 @@ function Checkout() {
 
   const [tocados, setTocados] = useState<Set<string>>(new Set());
   const [erroDaCobranca, setErroDaCobranca] = useState('');
+  /* Região viva única da tela: resumo de campos pendentes ou recusa de
+     pagamento — nunca as duas juntas, uma substitui a outra. */
+  const [mensagemDeStatus, setMensagemDeStatus] = useState('');
 
   const linhas = linhasDoCarrinho(itens, produtos);
   const precisaDeEntrega = pesoTotal(itens, produtos) > 0;
@@ -174,7 +178,21 @@ function Checkout() {
     const proximo = passos[passos.indexOf(passoAtual) + 1];
     if (proximo === undefined) return;
 
-    irPara(proximo <= pendente ? proximo : pendente);
+    if (proximo <= pendente) {
+      setMensagemDeStatus('');
+      irPara(proximo);
+      return;
+    }
+
+    setMensagemDeStatus(
+      mensagemDePassoBloqueado(
+        pendente,
+        dados.metodo,
+        Object.keys(errosDeEndereco).length,
+        Object.keys(errosDeCartao).length,
+      ),
+    );
+    irPara(pendente);
   };
 
   const voltar = () => {
@@ -209,6 +227,7 @@ function Checkout() {
     // Recusa não cria pedido: o carrinho fica intacto e o erro aparece no passo 3.
     if (pagamento.status === 'recusado') {
       setErroDaCobranca(ERRO_DE_CARTAO_RECUSADO);
+      setMensagemDeStatus(ERRO_DE_CARTAO_RECUSADO);
       irPara(3);
       return;
     }
@@ -266,6 +285,12 @@ function Checkout() {
       <h1 className="font-display text-3xl font-extrabold tracking-tight text-tinta md:text-4xl">
         Finalizar compra
       </h1>
+
+      {/* Região viva única da tela: resumo de campos pendentes ou recusa de
+          pagamento. Erro de campo mesmo é anunciado por aria-describedby. */}
+      <p aria-live="polite" className="sr-only">
+        {mensagemDeStatus}
+      </p>
 
       <div className="mt-8">
         <TrilhaDoCheckout passos={passos} atual={passoAtual} />
@@ -335,10 +360,12 @@ function Checkout() {
               erroDaCobranca={erroDaCobranca}
               aoMudarMetodo={(metodo: MetodoPagamento) => {
                 setErroDaCobranca('');
+                setMensagemDeStatus('');
                 setDados((anterior) => ({ ...anterior, metodo }));
               }}
               aoMudarCartao={(campo, valor) => {
                 setErroDaCobranca('');
+                setMensagemDeStatus('');
                 setDados((anterior) => ({
                   ...anterior,
                   cartao: {

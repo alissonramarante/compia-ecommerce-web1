@@ -75,6 +75,10 @@ caso('nao mostra itens do kit (so kit)', !novo.includes('Itens do kit'));
 caso('erros comecam vazios (nada tocado)', /id="erro-titulo"[^>]*>\s*<\/p>/.test(novo));
 caso('botao de cadastrar', novo.includes('Cadastrar produto'));
 caso('sem ids repetidos', idsSaoUnicos(novo));
+/* Erro de campo é anunciado por aria-describedby ao receber foco; a única
+   região viva (o resumo no rodapé) só existe depois de tentar salvar. */
+caso('sem regiao aria-live antes de tentar salvar', !novo.includes('aria-live'));
+caso('campo da ficha ja referencia o erro do grupo', novo.includes('aria-describedby="erro-ficha"'));
 
 /* ============ 5. formulário: editar físico ============ */
 secao('formulário — editar físico (prod-001)');
@@ -104,6 +108,9 @@ const editarEbook = pagina('/admin/produtos/prod-003');
 caso('mostra formatos, marcando os do produto', editarEbook.includes('id="produto-formato-pdf"') && editarEbook.includes('id="produto-formato-epub"'));
 caso('nao mostra estoque nem peso (e-book)', !editarEbook.includes('id="produto-estoque"') && !editarEbook.includes('id="produto-peso"'));
 caso('ainda mostra ficha catalografica (e-book tem ficha no mock)', editarEbook.includes('Ficha catalográfica'));
+caso('checkbox de formato referencia o erro do grupo', editarEbook.includes('aria-describedby="erro-formatos"'));
+caso('grupo de formatos tem id proprio', editarEbook.includes('id="erro-formatos"'));
+caso('sem ids repetidos', idsSaoUnicos(editarEbook));
 
 /* ============ 7. formulário: editar kit ============ */
 secao('formulário — editar kit (prod-009)');
@@ -113,6 +120,9 @@ caso('kit nao mostra ficha catalografica', !editarKit.includes('Ficha catalográ
 caso('kit mostra estoque e peso (tambem despacha)', editarKit.includes('id="produto-estoque"') && editarKit.includes('id="produto-peso"'));
 caso('o proprio kit nao aparece na lista de itens selecionaveis', !editarKit.includes('id="produto-item-kit-prod-009"'));
 caso('itens do kit vem marcados', editarKit.includes('id="produto-item-kit-prod-001"'));
+caso('checkbox de item do kit referencia o erro do grupo', editarKit.includes('aria-describedby="erro-itens-kit"'));
+caso('grupo de itens do kit tem id proprio', editarKit.includes('id="erro-itens-kit"'));
+caso('sem ids repetidos', idsSaoUnicos(editarKit));
 
 /* ============ 8. formulário: produto inexistente ============ */
 secao('formulário — produto inexistente');

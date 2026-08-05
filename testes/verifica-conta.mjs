@@ -41,6 +41,11 @@ conferir('revelado e pontuado', fmt.formatarCpf('12345678900'), '123.456.789-00'
 conferir('revelado idempotente', fmt.formatarCpf('123.456.789-00'), '123.456.789-00');
 conferir('revelado nao inventa', fmt.formatarCpf('123'), '123');
 
+secao('mensagemDeResumoDeErros — região viva única de formulário');
+conferir('zero', fmt.mensagemDeResumoDeErros(0), '0 campos precisam de correção');
+conferir('singular', fmt.mensagemDeResumoDeErros(1), '1 campo precisa de correção');
+conferir('plural', fmt.mensagemDeResumoDeErros(3), '3 campos precisam de correção');
+
 /* ============ 4. downloads ============ */
 secao('downloadsDoCliente');
 const deUm = c.downloadsDoCliente(pedidos, 'cli-001');

@@ -68,11 +68,7 @@ function PassoPagamento({
           aria-describedby={erro !== undefined ? `erro-cartao-${nome}` : undefined}
           className={`${CLASSE_CAMPO} ${nome === 'nome' ? '' : 'font-mono'}`}
         />
-        <p
-          id={`erro-cartao-${nome}`}
-          aria-live="polite"
-          className="mt-1 text-xs text-ocre-texto"
-        >
+        <p id={`erro-cartao-${nome}`} className="mt-1 text-xs text-ocre-texto">
           {erro ?? ''}
         </p>
       </div>
@@ -124,10 +120,7 @@ function PassoPagamento({
             </div>
             <div className="sm:col-span-2 sm:self-start">
               <p className={CLASSE_ROTULO}>Bandeira</p>
-              <p
-                aria-live="polite"
-                className="mt-2 border border-transparent py-2 font-mono text-sm text-grafite"
-              >
+              <p className="mt-2 border border-transparent py-2 font-mono text-sm text-grafite">
                 {NOME_DA_BANDEIRA[bandeira] === ''
                   ? '—'
                   : NOME_DA_BANDEIRA[bandeira]}
@@ -165,13 +158,12 @@ function PassoPagamento({
         </div>
       )}
 
-      {/* Recusa do processamento. Região sempre presente para ser anunciada. */}
-      <p
-        aria-live="assertive"
-        className={`mt-6 text-sm leading-relaxed ${erroDaCobranca === '' ? '' : 'border-l-2 border-ocre bg-white px-4 py-3 text-tinta'}`}
-      >
-        {erroDaCobranca}
-      </p>
+      {/* Recusa do processamento, visível aqui; anunciada pela região viva única do Checkout. */}
+      {erroDaCobranca !== '' && (
+        <p className="mt-6 border-l-2 border-ocre bg-white px-4 py-3 text-sm leading-relaxed text-tinta">
+          {erroDaCobranca}
+        </p>
+      )}
     </div>
   );
 }

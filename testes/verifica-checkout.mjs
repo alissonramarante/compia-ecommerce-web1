@@ -100,6 +100,13 @@ conferir('aviso de checkout abortado nomeia o cliente', ck.mensagemDeCheckoutAbo
 conferir('erro de recusa diz que nada foi cobrado', ck.ERRO_DE_CARTAO_RECUSADO.includes('Nada foi cobrado'), true);
 conferir('erro de recusa oferece saida', ck.ERRO_DE_CARTAO_RECUSADO.includes('PIX'), true);
 
+secao('mensagemDePassoBloqueado — região viva única do checkout');
+conferir('endereco com 3 erros', ck.mensagemDePassoBloqueado(1, null, 3, 0), '3 campos precisam de correção');
+conferir('endereco com 1 erro (singular)', ck.mensagemDePassoBloqueado(1, null, 1, 0), '1 campo precisa de correção');
+conferir('frete sem escolha nao tem campo, cai no aviso fixo', ck.mensagemDePassoBloqueado(2, null, 0, 0), ck.ERRO_FRETE_NAO_ESCOLHIDO);
+conferir('pagamento sem metodo escolhido cai no aviso fixo', ck.mensagemDePassoBloqueado(3, null, 0, 0), ck.ERRO_PAGAMENTO_NAO_ESCOLHIDO);
+conferir('cartao com 2 erros usa o resumo', ck.mensagemDePassoBloqueado(3, 'cartao', 0, 2), '2 campos precisam de correção');
+
 /* ============ 7. cobrança PIX vencida ============ */
 secao('cobrancaExpirada');
 const pixDeTeste = pg.gerarCobrancaPix(32736, '2026-02-26T11:30:00Z'); // expira 12:00
