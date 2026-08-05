@@ -67,7 +67,7 @@ function Checkout() {
   const { clienteCorrente } = useSessao();
   const { itens, subtotal, limpar, avisar } = useCarrinho();
   const { pedidos, adicionarPedido } = usePedidos();
-  const { produtos } = useProdutos();
+  const { produtos, baixarEstoque } = useProdutos();
 
   /* Fronteira do relógio. Congelado na montagem: a validação de validade de
      cartão compara mês, e um valor que muda a cada render só criaria ruído.
@@ -232,6 +232,7 @@ function Checkout() {
 
     finalizando.current = true;
     adicionarPedido(pedido);
+    baixarEstoque(itens);
     limpar();
     // `replace` para o voltar não cair de novo na confirmação.
     navegar(`/pedido/${numero}`, { replace: true });
