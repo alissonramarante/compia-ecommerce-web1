@@ -24,6 +24,10 @@ caso(P1, 'segundo autor tambem', (h) => h.includes('/catalogo?busca=Rui%20Amorim
 caso(P1, 'preco vigente', (h) => h.includes('R$ 159,00'));
 caso(P1, 'preco cheio riscado', (h) => h.includes('line-through') && h.includes('R$ 189,00'));
 caso(P1, 'nao-kit: % diz contra o preco de tabela', (h) => h.includes('16% abaixo do preço de tabela'));
+/* Um único elemento riso por tela: o selo na capa. O texto do desconto
+   junto ao preço fica em tinta, sem repetir o acento. */
+caso(P1, 'selo da capa continua em riso', (h) => h.includes('bg-riso'));
+caso(P1, 'texto do desconto fica em tinta, nao repete o riso', (h) => h.includes('text-tinta">16% abaixo do preço de tabela'));
 /* Em prod-001 os percentuais visíveis são: o selo da capa (−16%), a linha de
    preço (16%) — mesmo significado, sem ambiguidade — e o −18% do cartão do kit
    em "Relacionados", que é o selo da grade e deve continuar lá. */

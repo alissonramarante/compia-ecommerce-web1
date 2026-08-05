@@ -225,7 +225,7 @@ function Produto() {
             {/* O percentual só aparece quando é o único da tela; no kit ele
                 daria a entender que a economia é contra os avulsos. */}
             {desconto !== null && !ehKit && (
-              <span className="font-mono text-sm font-medium text-riso-texto">
+              <span className="font-mono text-sm font-medium text-tinta">
                 {desconto}% abaixo do preço de tabela
               </span>
             )}
