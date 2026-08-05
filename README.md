@@ -187,7 +187,7 @@ checkout seria apagado pela semente a cada recarga da página).
 npm run testes
 ```
 
-Ao rodar neste estado do projeto, a saída é **29 suítes e 1.470 asserções**,
+Ao rodar neste estado do projeto, a saída é **30 suítes e 1.478 asserções**,
 todas passando, em pouco mais de um segundo por suíte. O comando roda cada
 suíte em sequência, sai com código diferente de zero se qualquer uma falhar,
 e funciona num clone limpo, sem depender de nada que tenha ficado de uma
@@ -260,6 +260,11 @@ Documentadas de propósito, não esquecidas:
   esquecimento.
 - **Os links de download de e-book são fictícios** — nenhum arquivo real é
   servido.
+- **Não há CRUD de categorias.** A especificação original pede "suporte a
+  novos produtos e categorias sem necessidade de programação" — isso está
+  atendido para produtos (o CRUD do painel administrativo, desde a Fatia 7),
+  mas não para categorias: elas continuam fixas em `src/mocks/categorias.ts`,
+  e adicionar uma categoria nova exige editar código e gerar um novo build.
 
 ## Publicação
 
@@ -291,3 +296,6 @@ UASC). A especificação original do trabalho pedia uma loja construída em
 WordPress + WooCommerce; por orientação do próprio enunciado, ela foi
 substituída por uma aplicação em React com dados mocados, documentada neste
 README e em `CLAUDE.md`.
+
+Os requisitos originais contra os quais este projeto foi conferido estão
+transcritos em [`docs/especificacao-original.md`](./docs/especificacao-original.md).

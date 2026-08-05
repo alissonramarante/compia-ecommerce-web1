@@ -318,6 +318,12 @@ alterado não aparecer, é isso — rode o reset de demonstração em `/entrar`.
 - **Não há fluxo de devolução.** `entregue` e `cancelado` são terminais, e
   `StatusPagamento.estornado` existe no tipo sem nenhum caminho que o produza.
   Escolha de escopo, não esquecimento.
+- **Não há CRUD de categorias.** A spec pede "suporte a novos produtos e
+  categorias sem necessidade de programação" (ver `docs/especificacao-original.md`).
+  Isso está atendido para produtos, via `ProdutosContext` (Fatia 7). Para
+  categorias não: `src/mocks/categorias.ts` continua um array fixo, sem tela
+  de admin nem contexto próprio. Adicionar uma categoria hoje exige editar
+  esse arquivo e gerar um novo build.
 
 **Percentual precisa de referência** quando há mais de uma base de comparação
 na mesma tela, ou quando o número é a afirmação principal. Escreva "16% abaixo
