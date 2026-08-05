@@ -79,6 +79,12 @@ src/
   JSX. Ex.: `AUTOR_COLETIVO` em `lib/produto.ts` — `'Vários autores'` é rótulo,
   não pessoa, e não vira link. Comparação exata, sem normalizar: normalizar
   esconderia inconsistência de cadastro num dado que é controlado.
+- **Uma região `aria-live` por página.** Erro de campo é anunciado ao receber
+  foco, via `aria-describedby`; a região viva recebe só o resumo ("3 campos
+  precisam de correção") e mudanças sem campo dono (contagem de resultados,
+  aviso do carrinho). Várias regiões disparando juntas produzem fala sobreposta
+  e ilegível. Pelo mesmo motivo, valor derivado que muda a cada tecla (bandeira
+  do cartão) fica visível mas não é anunciado.
 - **ARIA só com o comportamento correspondente.** `role="tablist"` exige
   navegação por setas, `aria-controls` e `tabindex` gerenciado; sem isso, abas
   são links com `aria-current="page"`. Atributo sem comportamento é ARIA
@@ -174,32 +180,30 @@ bem impresso**: metadados em monoespaçada, hierarquia firme, muito branco.
 Tokens (definir em `tailwind.config.js`, usar só estes):
 
 ```
-tinta       #101418   texto e fundo escuro
-papel       #EEF0EA   fundo (levemente frio, não creme)
-azul        #23319E   ações primárias, links
-riso        #FF4F7B   acento único: promoção, badge, foco — só como bg-*
-ocre        #D9A521   alertas e estoque baixo — só como bg-*
-grafite     #5C6670   texto secundário, bordas
-ocre-texto  #8A6414   ocre legível em texto — 4,67:1 sobre papel, 5,37:1 sobre white
+tinta        #101418   texto e fundo escuro
+papel        #EEF0EA   fundo (levemente frio, não creme)
+azul         #23319E   ações primárias, links
+riso         #FF4F7B   acento único: promoção, badge, foco — só preenche
+ocre         #D9A521   alerta e estoque baixo — só preenche
+ocre-texto   #8A6414   alerta e estoque baixo em texto
+grafite      #5C6670   texto secundário, bordas
 ```
+
+**Cor saturada preenche, cor escura escreve.** `riso` e `ocre` puros reprovam
+WCAG AA como texto sobre fundo claro: 2,75:1 e 1,95:1 sobre `papel`. Como
+preenchimento com texto escuro em cima, estão corretos. Para texto existe
+`ocre-texto` — 4,67:1 sobre `papel` e 5,37:1 sobre `white`, matiz preservada
+(41° contra 43°). `riso` **nunca** escreve: não há `riso-texto`, e o texto que
+acompanha um selo `riso` vai em `tinta`.
+
+Contraste é calculado pela fórmula WCAG e verificado em
+`testes/verifica-contraste.mjs`, nunca estimado a olho. Lembre que a
+apresentação é em projetor, onde 2,7:1 simplesmente desaparece.
 
 Os tokens **substituem** a paleta do Tailwind, não a estendem: `bg-azul`
 funciona, `bg-azul-500` não existe. Nenhum nome de token deve colidir com uma
 paleta nativa do Tailwind — uma classe inexistente falha em silêncio, sem erro
 de build. Foi por isso que `indigo` virou `azul`.
-
-**Cor saturada preenche, cor escura escreve.** `riso` e `ocre` como `text-*`
-direto sobre `papel` ou `white` não passam de ~2,8:1 — abaixo do mínimo WCAG
-AA (4,5:1 para texto normal, 3:1 para texto grande e componentes de
-interface), calculado pela fórmula de luminância relativa, não estimado. Os
-dois só valem como **preenchimento** (`bg-riso`, `bg-ocre`) com `text-tinta`
-por cima — aí passam de 5,8:1. `riso` **nunca** escreve: não existe
-`riso-texto`, de propósito — é o único acento promocional da tela e não tem
-saída para virar texto sem deixar de ser "o" acento. `ocre` é semântico
-(estoque baixo, erro de campo, indicador de status) e precisa escrever, não
-só preencher: use `ocre-texto`, mesma matiz, escurecida até garantir 4,5:1
-contra os dois fundos claros do tema. `ocre-texto` nunca vai como `bg-*` — é
-versão escura só para leitura, o contrário anularia o acento.
 
 Tipografia (Google Fonts):
 
