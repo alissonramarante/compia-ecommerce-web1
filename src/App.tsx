@@ -18,6 +18,7 @@ import Entrar from './paginas/Entrar';
 import NaoEncontrada from './paginas/NaoEncontrada';
 import AdminPainel from './paginas/admin/Painel';
 import AdminProdutos from './paginas/admin/Produtos';
+import AdminProdutoFormulario from './paginas/admin/ProdutoFormulario';
 import AdminPedidos from './paginas/admin/Pedidos';
 import AdminLogs from './paginas/admin/Logs';
 
@@ -61,6 +62,22 @@ function App() {
                   element={
                     <AreaProtegida area="produtos">
                       <AdminProdutos />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="produtos/novo"
+                  element={
+                    <AreaProtegida area="produtos" exigeEdicao>
+                      <AdminProdutoFormulario />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="produtos/:id"
+                  element={
+                    <AreaProtegida area="produtos" exigeEdicao>
+                      <AdminProdutoFormulario />
                     </AreaProtegida>
                   }
                 />

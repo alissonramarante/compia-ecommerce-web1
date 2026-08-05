@@ -42,12 +42,21 @@ caso('vendedor em logs: barrado', vendedorEmLogs.includes('Você não tem acesso
 caso('vendedor em logs: diz as tres areas que alcança', vendedorEmLogs.includes('Ele alcança: Produtos, Pedidos, Clientes.'));
 
 const vendedorEmProdutos = admin('/admin/produtos', { clienteId: 'cli-001', usuarioId: 'usr-003' });
-caso('vendedor em produtos: acesso permitido (leitura)', vendedorEmProdutos.includes('Admin · Produtos'));
+caso('vendedor em produtos: acesso permitido (leitura)', vendedorEmProdutos.includes('<table'));
+caso('vendedor em produtos: sem botão de novo produto', !vendedorEmProdutos.includes('Novo produto'));
+
+const vendedorEmProdutoNovo = admin('/admin/produtos/novo', { clienteId: 'cli-001', usuarioId: 'usr-003' });
+caso('vendedor em /produtos/novo: barrado (só leitura)', vendedorEmProdutoNovo.includes('Este perfil só tem leitura aqui.'));
+caso('vendedor em /produtos/novo: nao renderiza o formulario', !vendedorEmProdutoNovo.includes('<form'));
 
 /* ============ 3. admin: acesso total ============ */
 secao('admin: acesso total');
 const adminEmProdutos = admin('/admin/produtos', { clienteId: 'cli-001', usuarioId: 'usr-001' }); // Renata, admin
-caso('admin acessa produtos', adminEmProdutos.includes('Admin · Produtos'));
+caso('admin acessa produtos', adminEmProdutos.includes('<table'));
+caso('admin em produtos: ve o botao de novo produto', adminEmProdutos.includes('Novo produto'));
+
+const adminEmProdutoNovo = admin('/admin/produtos/novo', { clienteId: 'cli-001', usuarioId: 'usr-001' });
+caso('admin acessa /produtos/novo', adminEmProdutoNovo.includes('<form'));
 const adminEmPedidos = admin('/admin/pedidos', { clienteId: 'cli-001', usuarioId: 'usr-001' });
 caso('admin acessa pedidos', adminEmPedidos.includes('Admin · Pedidos'));
 const adminEmLogs = admin('/admin/logs', { clienteId: 'cli-001', usuarioId: 'usr-001' });

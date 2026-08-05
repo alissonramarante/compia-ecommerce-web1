@@ -50,7 +50,7 @@ const doisFisicos = comArmazenamento([
   { produtoId: 'prod-006', quantidade: 1, precoUnitario: 14200 },
 ]);
 caso('dois fisicos: ids de campo distintos', doisFisicos.includes('id="quantidade-prod-001"') && doisFisicos.includes('id="quantidade-prod-006"'));
-caso('dois fisicos: nenhum id repetido', (() => { const ids = doisFisicos.match(/id="[^"]+"/g) || []; return new Set(ids).size === ids.length; })());
+caso('dois fisicos: nenhum id repetido', (() => { const ids = doisFisicos.match(/(?<![a-zA-Z-])id="[^"]+"/g) || []; return new Set(ids).size === ids.length; })());
 caso('dois fisicos: rotulo cita o produto', doisFisicos.includes('Quantidade de Algoritmos de Busca e Planejamento'));
 caso('dois fisicos: botoes citam o produto', doisFisicos.includes('aria-label="Aumentar quantidade de Fundamentos de Aprendizado Profundo"'));
 

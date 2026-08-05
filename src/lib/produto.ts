@@ -66,6 +66,22 @@ export function produtosDoKit(produtos: Produto[], kit: Produto): Produto[] {
 }
 
 /**
+ * Inverso de `produtosDoKit`: quais kits têm este produto entre os itens.
+ * Usa o admin para bloquear a exclusão de um produto que compõe algum kit —
+ * apagar o item deixaria o kit com um id fantasma no meio da lista.
+ *
+ * Testes de mesa:
+ *   kitsQueReferenciam(produtos, 'prod-001').map(k => k.id) → ['prod-009']
+ *   kitsQueReferenciam(produtos, 'prod-003')                → []
+ *   kitsQueReferenciam(produtos, 'prod-009')                → [] (o próprio kit não se referencia)
+ */
+export function kitsQueReferenciam(produtos: Produto[], produtoId: string): Produto[] {
+  return produtos.filter(
+    (produto) => produto.tipo === 'kit' && (produto.itensDoKit ?? []).includes(produtoId),
+  );
+}
+
+/**
  * Quanto o kit economiza em relação a comprar os títulos separados hoje.
  *
  * Os dois lados usam **preço vigente**: é a comparação honesta entre o que

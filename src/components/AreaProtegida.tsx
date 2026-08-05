@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import { ROTULO_DE_AREA, areasVisiveis, podeVer, type AreaAdmin } from '../lib/permissoes';
+import { ROTULO_DE_AREA, areasVisiveis, podeEditar, podeVer, type AreaAdmin } from '../lib/permissoes';
 import { useSessao } from '../hooks/useSessao';
 
 interface Props {
   /** Área exigida pela rota. Ausente cobre só a exigência de estar logado — é o caso do próprio /admin, que qualquer perfil da equipe acessa. */
   area?: AreaAdmin;
+  /** Marca uma rota de escrita (criar/editar) — exige `podeEditar`, não só `podeVer`. Vendedor lê produtos mas não abre o formulário. */
+  exigeEdicao?: boolean;
   children: ReactNode;
 }
 
@@ -26,7 +28,7 @@ const CLASSE_BOTAO =
  * Esconder o item de menu (LayoutAdmin) não substitui isto — é só a metade
  * visível. Quem digita o endereço direto ainda esbarra aqui.
  */
-function AreaProtegida({ area, children }: Props) {
+function AreaProtegida({ area, exigeEdicao = false, children }: Props) {
   const { usuarioCorrente } = useSessao();
 
   if (usuarioCorrente === null) {
@@ -44,27 +46,47 @@ function AreaProtegida({ area, children }: Props) {
     );
   }
 
-  if (area !== undefined && !podeVer(usuarioCorrente.perfil, area)) {
-    const alcancadas = areasVisiveis(usuarioCorrente.perfil);
+  if (area !== undefined) {
+    const { perfil } = usuarioCorrente;
 
-    return (
-      <div className={CLASSE_TELA}>
-        <h1 className={CLASSE_TITULO}>Você não tem acesso a esta área.</h1>
-        <p className="mt-3 leading-relaxed text-grafite">
-          Seu perfil atual é{' '}
-          <span className="font-mono text-sm uppercase tracking-wide text-tinta">
-            {usuarioCorrente.perfil}
-          </span>
-          .{' '}
-          {alcancadas.length === 0
-            ? 'Ele não dá acesso a nenhuma área do painel.'
-            : `Ele alcança: ${alcancadas.map((item) => ROTULO_DE_AREA[item]).join(', ')}.`}
-        </p>
-        <Link to="/admin" className="mt-8 inline-block font-display text-sm text-azul hover:underline">
-          Voltar ao painel
-        </Link>
-      </div>
-    );
+    if (!podeVer(perfil, area)) {
+      const alcancadas = areasVisiveis(perfil);
+
+      return (
+        <div className={CLASSE_TELA}>
+          <h1 className={CLASSE_TITULO}>Você não tem acesso a esta área.</h1>
+          <p className="mt-3 leading-relaxed text-grafite">
+            Seu perfil atual é{' '}
+            <span className="font-mono text-sm uppercase tracking-wide text-tinta">{perfil}</span>.{' '}
+            {alcancadas.length === 0
+              ? 'Ele não dá acesso a nenhuma área do painel.'
+              : `Ele alcança: ${alcancadas.map((item) => ROTULO_DE_AREA[item]).join(', ')}.`}
+          </p>
+          <Link to="/admin" className="mt-8 inline-block font-display text-sm text-azul hover:underline">
+            Voltar ao painel
+          </Link>
+        </div>
+      );
+    }
+
+    if (exigeEdicao && !podeEditar(perfil, area)) {
+      return (
+        <div className={CLASSE_TELA}>
+          <h1 className={CLASSE_TITULO}>Este perfil só tem leitura aqui.</h1>
+          <p className="mt-3 leading-relaxed text-grafite">
+            Seu perfil atual é{' '}
+            <span className="font-mono text-sm uppercase tracking-wide text-tinta">{perfil}</span>{' '}
+            e pode ver {ROTULO_DE_AREA[area].toLowerCase()}, mas não criar nem editar.
+          </p>
+          <Link
+            to={`/admin/${area}`}
+            className="mt-8 inline-block font-display text-sm text-azul hover:underline"
+          >
+            Voltar à lista
+          </Link>
+        </div>
+      );
+    }
   }
 
   return <>{children}</>;

@@ -30,6 +30,12 @@ conferir('produtosDoKit nao-kit', lib.produtosDoKit(produtos, p('prod-001')), []
 conferir('economiaDoKit prod-009', lib.economiaDoKit(produtos, p('prod-009')), { soma: 57300, economia: 12400, percentual: 22 });
 conferir('economiaDoKit nao-kit', lib.economiaDoKit(produtos, p('prod-001')), { soma: 0, economia: 0, percentual: 0 });
 
+conferir('kitsQueReferenciam prod-001 (esta no kit)', lib.kitsQueReferenciam(produtos, 'prod-001').map((x) => x.id), ['prod-009']);
+conferir('kitsQueReferenciam prod-002 (esta no kit)', lib.kitsQueReferenciam(produtos, 'prod-002').map((x) => x.id), ['prod-009']);
+conferir('kitsQueReferenciam prod-003 (nao esta em kit nenhum)', lib.kitsQueReferenciam(produtos, 'prod-003'), []);
+conferir('kitsQueReferenciam o proprio kit nao se referencia', lib.kitsQueReferenciam(produtos, 'prod-009'), []);
+conferir('kitsQueReferenciam id fantasma', lib.kitsQueReferenciam(produtos, 'zzz'), []);
+
 const kitCaro = { ...p('prod-009'), preco: 60000, precoPromocional: undefined };
 const kitNeutro = { ...p('prod-009'), preco: 57300, precoPromocional: undefined };
 conferir('economiaDoKit kit caro (negativa)', lib.economiaDoKit(produtos, kitCaro), { soma: 57300, economia: -2700, percentual: -5 });

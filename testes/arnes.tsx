@@ -20,6 +20,7 @@ import Entrar from '../src/paginas/Entrar/index.tsx';
 import NaoEncontrada from '../src/paginas/NaoEncontrada/index.tsx';
 import AdminPainel from '../src/paginas/admin/Painel/index.tsx';
 import AdminProdutos from '../src/paginas/admin/Produtos/index.tsx';
+import AdminProdutoFormulario from '../src/paginas/admin/ProdutoFormulario/index.tsx';
 import AdminPedidos from '../src/paginas/admin/Pedidos/index.tsx';
 import AdminLogs from '../src/paginas/admin/Logs/index.tsx';
 
@@ -137,6 +138,22 @@ function RotasAdmin() {
         element={
           <AreaProtegida area="produtos">
             <AdminProdutos />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="produtos/novo"
+        element={
+          <AreaProtegida area="produtos" exigeEdicao>
+            <AdminProdutoFormulario />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="produtos/:id"
+        element={
+          <AreaProtegida area="produtos" exigeEdicao>
+            <AdminProdutoFormulario />
           </AreaProtegida>
         }
       />
