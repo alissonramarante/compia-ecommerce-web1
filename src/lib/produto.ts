@@ -224,3 +224,31 @@ export function baixarEstoque(
     return { ...produto, estoque: Math.max(0, produto.estoque - item.quantidade) };
   });
 }
+
+/**
+ * Inverso de `baixarEstoque` — devolve unidades ao cancelar um pedido que
+ * ainda não foi despachado (`lib/statusPedido.ts` decide quando isso vale).
+ * E-book não muda; produto que saiu do catálogo é ignorado, sem erro.
+ *
+ * Testes de mesa (prod-002 estoque 7, prod-003 e-book estoque null):
+ *   devolverEstoque(produtos, [{produtoId:'prod-002', quantidade:3}])
+ *     → prod-002.estoque 10, demais intactos
+ *   devolverEstoque(produtos, [{produtoId:'prod-003', quantidade:1}])
+ *     → prod-003.estoque continua null
+ *   devolverEstoque(produtos, [{produtoId:'zzz', quantidade:1}])
+ *     → produtos intactos, item fantasma ignorado
+ *   não muta o array nem os produtos recebidos
+ */
+export function devolverEstoque(
+  produtos: Produto[],
+  itens: { produtoId: string; quantidade: number }[],
+): Produto[] {
+  return produtos.map((produto) => {
+    if (produto.estoque === null) return produto;
+
+    const item = itens.find((candidato) => candidato.produtoId === produto.id);
+    if (item === undefined) return produto;
+
+    return { ...produto, estoque: produto.estoque + item.quantidade };
+  });
+}

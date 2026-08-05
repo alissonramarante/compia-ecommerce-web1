@@ -22,6 +22,8 @@ import AdminPainel from '../src/paginas/admin/Painel/index.tsx';
 import AdminProdutos from '../src/paginas/admin/Produtos/index.tsx';
 import AdminProdutoFormulario from '../src/paginas/admin/ProdutoFormulario/index.tsx';
 import AdminPedidos from '../src/paginas/admin/Pedidos/index.tsx';
+import AdminPedidoDetalhe from '../src/paginas/admin/PedidoDetalhe/index.tsx';
+import AdminClientes from '../src/paginas/admin/Clientes/index.tsx';
 import AdminLogs from '../src/paginas/admin/Logs/index.tsx';
 
 /**
@@ -162,6 +164,22 @@ function RotasAdmin() {
         element={
           <AreaProtegida area="pedidos">
             <AdminPedidos />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="pedidos/:numero"
+        element={
+          <AreaProtegida area="pedidos">
+            <AdminPedidoDetalhe />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="clientes"
+        element={
+          <AreaProtegida area="clientes">
+            <AdminClientes />
           </AreaProtegida>
         }
       />

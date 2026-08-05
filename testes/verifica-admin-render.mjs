@@ -31,7 +31,7 @@ const editorEmPedidos = admin('/admin/pedidos', { clienteId: 'cli-001', usuarioI
 caso('editor em pedidos: mensagem de acesso negado', editorEmPedidos.includes('Você não tem acesso a esta área.'));
 caso('editor em pedidos: diz o perfil em uso', editorEmPedidos.includes('editor'));
 caso('editor em pedidos: diz o que ele alcança', editorEmPedidos.includes('Ele alcança: Produtos.'));
-caso('editor em pedidos: nao renderiza o conteudo da area', !editorEmPedidos.includes('Admin · Pedidos'));
+caso('editor em pedidos: nao renderiza o conteudo da area', !editorEmPedidos.includes('<table'));
 caso('editor em pedidos: layout do painel continua visivel', editorEmPedidos.includes('Visão geral'));
 
 const editorEmLogs = admin('/admin/logs', { clienteId: 'cli-001', usuarioId: 'usr-002' });
@@ -58,7 +58,7 @@ caso('admin em produtos: ve o botao de novo produto', adminEmProdutos.includes('
 const adminEmProdutoNovo = admin('/admin/produtos/novo', { clienteId: 'cli-001', usuarioId: 'usr-001' });
 caso('admin acessa /produtos/novo', adminEmProdutoNovo.includes('<form'));
 const adminEmPedidos = admin('/admin/pedidos', { clienteId: 'cli-001', usuarioId: 'usr-001' });
-caso('admin acessa pedidos', adminEmPedidos.includes('Admin · Pedidos'));
+caso('admin acessa pedidos', adminEmPedidos.includes('<table'));
 const adminEmLogs = admin('/admin/logs', { clienteId: 'cli-001', usuarioId: 'usr-001' });
 caso('admin acessa logs', adminEmLogs.includes('Admin · Logs'));
 const adminNoPainel = admin('/admin', { clienteId: 'cli-001', usuarioId: 'usr-001' });

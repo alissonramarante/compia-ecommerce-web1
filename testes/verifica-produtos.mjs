@@ -76,6 +76,36 @@ const antesDaBaixa = JSON.parse(JSON.stringify(produtos));
 lib.baixarEstoque(produtos, [{ produtoId: 'prod-002', quantidade: 5 }]);
 conferir('nao muta o array nem os produtos recebidos', produtos, antesDaBaixa);
 
+/* ============ 1b. devolverEstoque ============ */
+secao('devolverEstoque');
+conferir(
+  'devolve ao estoque do item cancelado',
+  lib.devolverEstoque(produtos, [{ produtoId: 'prod-002', quantidade: 3 }]).find((x) => x.id === 'prod-002').estoque,
+  10,
+);
+conferir(
+  'e-book (estoque null) nao muda ao devolver',
+  lib.devolverEstoque(produtos, [{ produtoId: 'prod-003', quantidade: 1 }]).find((x) => x.id === 'prod-003').estoque,
+  null,
+);
+conferir(
+  'devolve a um produto esgotado, tirando do zero',
+  lib.devolverEstoque(produtos, [{ produtoId: 'prod-008', quantidade: 2 }]).find((x) => x.id === 'prod-008').estoque,
+  2,
+);
+conferir('item fantasma e ignorado', lib.devolverEstoque(produtos, [{ produtoId: 'zzz', quantidade: 1 }]), produtos);
+conferir(
+  'baixar e depois devolver a mesma quantidade volta ao estoque original',
+  lib.devolverEstoque(lib.baixarEstoque(produtos, [{ produtoId: 'prod-006', quantidade: 2 }]), [
+    { produtoId: 'prod-006', quantidade: 2 },
+  ]).find((x) => x.id === 'prod-006').estoque,
+  p('prod-006').estoque,
+);
+
+const antesDaDevolucao = JSON.parse(JSON.stringify(produtos));
+lib.devolverEstoque(produtos, [{ produtoId: 'prod-002', quantidade: 5 }]);
+conferir('devolverEstoque nao muta o array nem os produtos recebidos', produtos, antesDaDevolucao);
+
 /* ============ 2. produtosArmazenados ============ */
 secao('produtosArmazenados');
 conferir('chave versionada', arm.CHAVE_PRODUTOS, 'compia:produtos:v1');
@@ -139,6 +169,10 @@ conferir('excluir id inexistente e inocuo', ctx.reducerProdutos(estado, { tipo: 
 const comBaixa = ctx.reducerProdutos(estado, { tipo: 'baixarEstoque', itens: [{ produtoId: 'prod-002', quantidade: 2 }] });
 conferir('baixarEstoque delega a lib/produto', comBaixa.produtos.find((x) => x.id === 'prod-002').estoque, p('prod-002').estoque - 2);
 conferir('baixarEstoque nao mexe em quem nao foi comprado', comBaixa.produtos.find((x) => x.id === 'prod-001').estoque, p('prod-001').estoque);
+
+const comDevolucao = ctx.reducerProdutos(estado, { tipo: 'devolverEstoque', itens: [{ produtoId: 'prod-002', quantidade: 2 }] });
+conferir('devolverEstoque delega a lib/produto', comDevolucao.produtos.find((x) => x.id === 'prod-002').estoque, p('prod-002').estoque + 2);
+conferir('devolverEstoque nao mexe em quem nao foi devolvido', comDevolucao.produtos.find((x) => x.id === 'prod-001').estoque, p('prod-001').estoque);
 
 /* ============ 4. criarEstadoInicial ============ */
 secao('criarEstadoInicial');

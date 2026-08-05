@@ -2,7 +2,10 @@ import { createContext, useEffect, useMemo, useReducer, type ReactNode } from 'r
 
 import type { Produto } from '../types';
 import { produtos as produtosIniciais } from '../mocks';
-import { baixarEstoque as baixarEstoqueDosItens } from '../lib/produto';
+import {
+  baixarEstoque as baixarEstoqueDosItens,
+  devolverEstoque as devolverEstoqueDosItens,
+} from '../lib/produto';
 import { carregarProdutos, salvar } from '../lib/produtosArmazenados';
 
 export interface EstadoProdutos {
@@ -12,7 +15,8 @@ export interface EstadoProdutos {
 export type AcaoProdutos =
   | { tipo: 'salvar'; produto: Produto }
   | { tipo: 'excluir'; produtoId: string }
-  | { tipo: 'baixarEstoque'; itens: { produtoId: string; quantidade: number }[] };
+  | { tipo: 'baixarEstoque'; itens: { produtoId: string; quantidade: number }[] }
+  | { tipo: 'devolverEstoque'; itens: { produtoId: string; quantidade: number }[] };
 
 /**
  * Reducer puro: sem `localStorage`, sem relógio.
@@ -21,8 +25,10 @@ export type AcaoProdutos =
  * novo. É o mesmo caminho para criar e editar (Tarefa 2): quem decide qual é
  * o caso é a presença do id, não uma flag separada.
  *
- * `baixarEstoque` delega a `lib/produto.ts`, onde a regra (nunca negativo,
- * e-book intocado) é pura e testável sem React.
+ * `baixarEstoque` e `devolverEstoque` delegam a `lib/produto.ts`, onde a
+ * regra (nunca negativo, e-book intocado) é pura e testável sem React.
+ * `devolverEstoque` existe para o cancelamento de pedido não despachado da
+ * Tarefa 3 — ver `lib/statusPedido.ts`.
  */
 export function reducerProdutos(estado: EstadoProdutos, acao: AcaoProdutos): EstadoProdutos {
   switch (acao.tipo) {
@@ -43,6 +49,9 @@ export function reducerProdutos(estado: EstadoProdutos, acao: AcaoProdutos): Est
 
     case 'baixarEstoque':
       return { produtos: baixarEstoqueDosItens(estado.produtos, acao.itens) };
+
+    case 'devolverEstoque':
+      return { produtos: devolverEstoqueDosItens(estado.produtos, acao.itens) };
   }
 }
 
@@ -57,6 +66,7 @@ export interface ValorDosProdutos {
   salvarProduto: (produto: Produto) => void;
   excluirProduto: (produtoId: string) => void;
   baixarEstoque: (itens: { produtoId: string; quantidade: number }[]) => void;
+  devolverEstoque: (itens: { produtoId: string; quantidade: number }[]) => void;
 }
 
 export const ProdutosContext = createContext<ValorDosProdutos | null>(null);
@@ -85,6 +95,7 @@ function ProdutosProvider({ children }: Props) {
       salvarProduto: (produto) => despachar({ tipo: 'salvar', produto }),
       excluirProduto: (produtoId) => despachar({ tipo: 'excluir', produtoId }),
       baixarEstoque: (itens) => despachar({ tipo: 'baixarEstoque', itens }),
+      devolverEstoque: (itens) => despachar({ tipo: 'devolverEstoque', itens }),
     }),
     [estado.produtos],
   );

@@ -4,10 +4,10 @@ import { LogOut } from 'lucide-react';
 import { ROTULO_DE_AREA, areasVisiveis, type AreaAdmin } from '../lib/permissoes';
 import { useSessao } from '../hooks/useSessao';
 
-/** Só as áreas que já têm rota própria nesta fatia; `clientes` ainda não tem página. */
-const ROTA_DA_AREA: Partial<Record<AreaAdmin, string>> = {
+const ROTA_DA_AREA: Record<AreaAdmin, string> = {
   produtos: '/admin/produtos',
   pedidos: '/admin/pedidos',
+  clientes: '/admin/clientes',
   logs: '/admin/logs',
 };
 
@@ -28,9 +28,7 @@ function LayoutAdmin() {
   // AreaProtegida (sem `area`) já garante isto antes de LayoutAdmin renderizar.
   if (usuarioCorrente === null) return null;
 
-  const areas = areasVisiveis(usuarioCorrente.perfil).filter(
-    (area): area is Exclude<AreaAdmin, 'clientes'> => area in ROTA_DA_AREA,
-  );
+  const areas = areasVisiveis(usuarioCorrente.perfil);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 md:flex-row md:px-6">
@@ -55,7 +53,7 @@ function LayoutAdmin() {
             {areas.map((area) => (
               <li key={area}>
                 <NavLink
-                  to={ROTA_DA_AREA[area] as string}
+                  to={ROTA_DA_AREA[area]}
                   className={({ isActive }) =>
                     `${CLASSE_LINK_DE_AREA} ${isActive ? 'text-azul' : 'text-tinta hover:text-azul'}`
                   }

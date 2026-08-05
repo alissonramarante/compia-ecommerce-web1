@@ -20,6 +20,8 @@ import AdminPainel from './paginas/admin/Painel';
 import AdminProdutos from './paginas/admin/Produtos';
 import AdminProdutoFormulario from './paginas/admin/ProdutoFormulario';
 import AdminPedidos from './paginas/admin/Pedidos';
+import AdminPedidoDetalhe from './paginas/admin/PedidoDetalhe';
+import AdminClientes from './paginas/admin/Clientes';
 import AdminLogs from './paginas/admin/Logs';
 
 /**
@@ -86,6 +88,22 @@ function App() {
                   element={
                     <AreaProtegida area="pedidos">
                       <AdminPedidos />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="pedidos/:numero"
+                  element={
+                    <AreaProtegida area="pedidos">
+                      <AdminPedidoDetalhe />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="clientes"
+                  element={
+                    <AreaProtegida area="clientes">
+                      <AdminClientes />
                     </AreaProtegida>
                   }
                 />

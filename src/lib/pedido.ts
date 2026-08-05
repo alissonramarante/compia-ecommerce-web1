@@ -10,6 +10,7 @@ import type {
   StatusPedido,
 } from '../types';
 import { calcularSubtotal } from './carrinho';
+import { normalizarTexto } from './catalogo';
 import { gerarCobrancaPix } from './pagamento';
 
 /**
@@ -296,5 +297,97 @@ export function renovarCobrancaPix(pedido: Pedido, agora: string): Pedido {
       },
     ],
     atualizadoEm: agora,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Admin: filtro da lista e agregados por cliente                   */
+/* ------------------------------------------------------------------ */
+
+/** Estados em que o pagamento foi de fato capturado — o que conta como "pedido pago" para métricas. */
+const STATUS_PAGOS: readonly StatusPedido[] = [
+  'pago',
+  'em_separacao',
+  'enviado',
+  'pronto_para_retirada',
+  'entregue',
+];
+
+/**
+ * Testes de mesa:
+ *   pedidoFoiPago('pago')                 → true
+ *   pedidoFoiPago('entregue')             → true
+ *   pedidoFoiPago('aguardando_pagamento') → false
+ *   pedidoFoiPago('cancelado')            → false
+ */
+export function pedidoFoiPago(status: StatusPedido): boolean {
+  return (STATUS_PAGOS as readonly StatusPedido[]).includes(status);
+}
+
+export interface FiltrosDePedidos {
+  /** Casa com número do pedido ou nome do cliente, sem acento e sem caixa. */
+  busca: string;
+  status: StatusPedido | '';
+  /** Id exato — usado pelo link "ver pedidos" de /admin/clientes. `''` = todos. */
+  clienteId: string;
+}
+
+/**
+ * Lista para o painel: mais recente primeiro. Reaproveita `normalizarTexto`
+ * do catálogo — mesma regra de busca sem acento usada em toda a loja.
+ *
+ * Testes de mesa (sobre os 4 pedidos do mock):
+ *   sem filtro                          → os 4, mais recente primeiro
+ *   busca 'cpa-2026-0142'               → 1 (bate pelo número)
+ *   busca 'larissa'                     → os pedidos de Larissa Fontes (nome, sem acento/caixa)
+ *   status 'cancelado'                  → só o pedido cancelado
+ *   clienteId 'cli-001'                 → só os pedidos desse cliente
+ *   busca + status juntos               → interseção dos dois
+ */
+export function filtrarPedidos(
+  pedidos: Pedido[],
+  clientes: Cliente[],
+  filtros: FiltrosDePedidos,
+): Pedido[] {
+  const termo = normalizarTexto(filtros.busca);
+  const nomeDoCliente = (clienteId: string) =>
+    clientes.find((cliente) => cliente.id === clienteId)?.nome ?? '';
+
+  return pedidos
+    .filter((pedido) => {
+      if (filtros.clienteId !== '' && pedido.clienteId !== filtros.clienteId) return false;
+      if (filtros.status !== '' && pedido.status !== filtros.status) return false;
+
+      if (termo !== '') {
+        const alvo = normalizarTexto(`${pedido.numero} ${nomeDoCliente(pedido.clienteId)}`);
+        if (!alvo.includes(termo)) return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+}
+
+/**
+ * Resumo de um cliente para `/admin/clientes` — tudo derivado dos pedidos
+ * carregados, nada hardcodado. `quantidadeDePedidos` conta todos;
+ * `totalGasto` soma só os pagos, para não inflar a métrica com pedido que
+ * nunca chegou a pagar ou foi cancelado.
+ *
+ * Testes de mesa (cli-001 nos mocks: ped-001 pago/entregue-like e outros):
+ *   cliente sem pedido nenhum                → { quantidadeDePedidos: 0, totalGasto: 0 }
+ *   cliente com pedidos pagos e cancelados   → quantidade conta todos, totalGasto só os pagos
+ */
+export function resumoDoCliente(
+  clienteId: string,
+  pedidos: Pedido[],
+): { quantidadeDePedidos: number; totalGasto: number } {
+  const doCliente = pedidos.filter((pedido) => pedido.clienteId === clienteId);
+
+  return {
+    quantidadeDePedidos: doCliente.length,
+    totalGasto: doCliente
+      .filter((pedido) => pedidoFoiPago(pedido.status))
+      .reduce((total, pedido) => total + pedido.total, 0),
   };
 }

@@ -164,6 +164,33 @@ conferir('getItem que lanca: cai na semente', arm.carregarPedidos(pedidos).lengt
 conferir('setItem que lanca nao propaga', (() => { try { arm.salvar(pedidos); return 'nao lancou'; } catch { return 'LANCOU'; } })(), 'nao lancou');
 delete globalThis.localStorage;
 
+/* ============ 5b. admin: pedidoFoiPago, filtrarPedidos, resumoDoCliente ============ */
+secao('pedidoFoiPago');
+conferir('pago', lib.pedidoFoiPago('pago'), true);
+conferir('em_separacao', lib.pedidoFoiPago('em_separacao'), true);
+conferir('enviado', lib.pedidoFoiPago('enviado'), true);
+conferir('pronto_para_retirada', lib.pedidoFoiPago('pronto_para_retirada'), true);
+conferir('entregue', lib.pedidoFoiPago('entregue'), true);
+conferir('aguardando_pagamento', lib.pedidoFoiPago('aguardando_pagamento'), false);
+conferir('cancelado', lib.pedidoFoiPago('cancelado'), false);
+
+secao('filtrarPedidos');
+const semFiltro = { busca: '', status: '', clienteId: '' };
+conferir('sem filtro: os 4, mais recente primeiro', lib.filtrarPedidos(pedidos, clientes, semFiltro).map((x) => x.numero), ['CPA-2026-0142', 'CPA-2026-0141', 'CPA-2026-0140', 'CPA-2026-0139']);
+conferir('busca pelo numero', lib.filtrarPedidos(pedidos, clientes, { ...semFiltro, busca: 'cpa-2026-0142' }).map((x) => x.numero), ['CPA-2026-0142']);
+conferir('busca pelo nome do cliente (sem acento/caixa)', lib.filtrarPedidos(pedidos, clientes, { ...semFiltro, busca: 'LARISSA' }).map((x) => x.numero), ['CPA-2026-0141']);
+conferir('busca sem resultado', lib.filtrarPedidos(pedidos, clientes, { ...semFiltro, busca: 'zzzznada' }), []);
+conferir('filtro por status', lib.filtrarPedidos(pedidos, clientes, { ...semFiltro, status: 'cancelado' }).map((x) => x.numero), ['CPA-2026-0142']);
+conferir('filtro por clienteId exato', lib.filtrarPedidos(pedidos, clientes, { ...semFiltro, clienteId: 'cli-001' }).map((x) => x.numero), ['CPA-2026-0142', 'CPA-2026-0139']);
+conferir('busca + status combinados', lib.filtrarPedidos(pedidos, clientes, { busca: 'yasmim', status: 'entregue', clienteId: '' }).map((x) => x.numero), ['CPA-2026-0139']);
+conferir('busca + status sem interseccao', lib.filtrarPedidos(pedidos, clientes, { busca: 'yasmim', status: 'enviado', clienteId: '' }), []);
+
+secao('resumoDoCliente');
+conferir('cli-001: 2 pedidos, so 1 pago (ped-004 e cancelado)', lib.resumoDoCliente('cli-001', pedidos), { quantidadeDePedidos: 2, totalGasto: 6900 });
+conferir('cli-002: 1 pedido, pago (enviado)', lib.resumoDoCliente('cli-002', pedidos), { quantidadeDePedidos: 1, totalGasto: 44900 });
+conferir('cli-003: 1 pedido, ainda aguardando pagamento', lib.resumoDoCliente('cli-003', pedidos), { quantidadeDePedidos: 1, totalGasto: 0 });
+conferir('cliente sem pedido nenhum', lib.resumoDoCliente('cli-999', pedidos), { quantidadeDePedidos: 0, totalGasto: 0 });
+
 /* ============ 6. reducer ============ */
 secao('reducerPedidos');
 const estado = { pedidos: [pedidos[0], pedidos[1]] };
