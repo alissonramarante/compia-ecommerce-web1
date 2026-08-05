@@ -1,5 +1,6 @@
-import { carregarArnes } from './arnes.mjs';
+import { carregarArnes, carregarModulo } from './arnes.mjs';
 const { renderizarComProvedores } = await carregarArnes();
+const { produtos: produtosMock } = await carregarModulo('src/mocks/produtos.ts', 'produtosMockParaCarrinhoRender');
 
 function comArmazenamento(itens) {
   return renderizarComProvedores('/carrinho', {
@@ -69,6 +70,39 @@ caso('avisos: item fantasma aparece', comAvisos.includes('saiu do catálogo e fo
 caso('avisos: região aria-live', comAvisos.includes('aria-live="polite"'));
 caso('avisos: cada um é dispensável', comAvisos.includes('Dispensar'));
 caso('avisos: item fantasma não vira linha', !comAvisos.includes('prod-999'));
+
+/* --- reconciliação contra o catálogo vivo do ProdutosContext ---
+   Confirma a consequência da Tarefa 0: o carrinho reconcilia contra o
+   catálogo do ProdutosContext, não contra o mock estático. Simula um
+   preço e um estoque já editados (Tarefa 2), seedando compia:produtos:v1
+   diferente do mock embutido. */
+const catalogoComPrecoEditado = produtosMock.map((produto) =>
+  produto.id === 'prod-001' ? { ...produto, precoPromocional: 12000 } : produto,
+);
+const precoEditado = renderizarComProvedores('/carrinho', {
+  comLayout: true,
+  carrinhos: { 'cli-001': [{ produtoId: 'prod-001', quantidade: 1, precoUnitario: 15900 }] },
+  produtos: catalogoComPrecoEditado,
+});
+caso(
+  'preço editado no ProdutosContext dispara o aviso de reconciliação',
+  precoEditado.includes('mudou de R$ 159,00 para R$ 120,00'),
+);
+caso('preço editado: linha usa o preço vigente do catálogo, não o congelado', precoEditado.includes('R$ 120,00'));
+
+const catalogoComEstoqueReduzido = produtosMock.map((produto) =>
+  produto.id === 'prod-006' ? { ...produto, estoque: 1 } : produto,
+);
+const estoqueReduzido = renderizarComProvedores('/carrinho', {
+  comLayout: true,
+  carrinhos: { 'cli-001': [{ produtoId: 'prod-006', quantidade: 3, precoUnitario: 14200 }] },
+  produtos: catalogoComEstoqueReduzido,
+});
+caso(
+  'estoque reduzido no ProdutosContext dispara o aviso de reconciliação',
+  estoqueReduzido.includes('teve a quantidade reduzida de 3 para 1, o estoque disponível'),
+);
+caso('estoque reduzido: quantidade da linha cai para o novo teto', estoqueReduzido.includes('id="quantidade-prod-006"') && estoqueReduzido.includes('value="1"'));
 
 /* --- singular no contador --- */
 const umItem = comArmazenamento([{ produtoId: 'prod-005', quantidade: 1, precoUnitario: 6900 }]);

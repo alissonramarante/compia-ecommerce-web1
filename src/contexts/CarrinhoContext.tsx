@@ -1,7 +1,6 @@
 import { createContext, useEffect, useMemo, useReducer, type ReactNode } from 'react';
 
 import type { ItemCarrinho, Produto } from '../types';
-import { produtos as produtosDosMocks } from '../mocks';
 import {
   adicionarItem,
   alterarQuantidade,
@@ -116,15 +115,13 @@ function comIds(textos: string[]): Aviso[] {
 /**
  * Carga inicial do cliente corrente.
  *
- * `produtos` tem o catálogo dos mocks como padrão para quem chama a função
- * fora do `<CarrinhoProvider>` — as suítes de teste, que reconciliam contra
- * o catálogo real. Em tempo de execução o provider passa o catálogo vivo do
- * `ProdutosContext`, para refletir estoque e preço já editados no admin.
+ * `produtos` é obrigatório, de propósito: um valor padrão para o mock seria
+ * a mesma falha silenciosa de tornar `produtos` opcional em
+ * `aplicarPagamento` — um chamador distraído reconciliaria contra um
+ * catálogo congelado, exatamente o que a reconciliação existe para pegar.
+ * Em tempo de execução o provider passa o catálogo vivo do `ProdutosContext`.
  */
-export function criarEstadoInicial(
-  clienteId: string,
-  produtos: Produto[] = produtosDosMocks,
-): EstadoCarrinho {
+export function criarEstadoInicial(clienteId: string, produtos: Produto[]): EstadoCarrinho {
   const { itens, avisos } = carregarReconciliado(produtos, clienteId);
 
   return {

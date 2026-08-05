@@ -179,7 +179,7 @@ globalThis.localStorage = armazenamentoFalso({
     { produtoId: 'prod-006', quantidade: 9, precoUnitario: 14200 },
   ]),
 });
-const inicial = ctx.criarEstadoInicial('cli-001');
+const inicial = ctx.criarEstadoInicial('cli-001', produtos);
 conferir('carga inicial reconcilia os itens', inicial.itens, [
   { produtoId: 'prod-001', quantidade: 1, precoUnitario: 15900 },
   { produtoId: 'prod-006', quantidade: 3, precoUnitario: 14200 },
@@ -187,7 +187,7 @@ conferir('carga inicial reconcilia os itens', inicial.itens, [
 conferir('carga inicial produz 3 avisos', inicial.avisos.length, 3);
 conferir('avisos recebem id estavel', inicial.avisos.map((x) => x.id), ['aviso-0', 'aviso-1', 'aviso-2']);
 globalThis.localStorage = armazenamentoFalso({ 'compia:carrinho:v1:cli-001': 'nao e json' });
-conferir('storage corrompido: estado vazio, sem aviso', ctx.criarEstadoInicial('cli-001'), { clienteId: 'cli-001', itens: [], avisos: [], sequenciaDeAvisos: 0 });
+conferir('storage corrompido: estado vazio, sem aviso', ctx.criarEstadoInicial('cli-001', produtos), { clienteId: 'cli-001', itens: [], avisos: [], sequenciaDeAvisos: 0 });
 delete globalThis.localStorage;
 
 /* ================= 11. carrinho por cliente ================= */

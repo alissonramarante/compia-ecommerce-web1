@@ -20,11 +20,46 @@ conferir(
   lib.baixarEstoque(produtos, [{ produtoId: 'prod-003', quantidade: 1 }]).find((x) => x.id === 'prod-003').estoque,
   null,
 );
+conferir(
+  'e-book continua null mesmo com quantidade alta',
+  lib.baixarEstoque(produtos, [{ produtoId: 'prod-005', quantidade: 50 }]).find((x) => x.id === 'prod-005').estoque,
+  null,
+);
+conferir(
+  'todos os e-books da lista permanecem com estoque null',
+  lib.baixarEstoque(produtos, [{ produtoId: 'prod-003', quantidade: 1 }])
+    .filter((x) => x.tipo === 'ebook')
+    .every((x) => x.estoque === null),
+  true,
+);
 
 conferir(
-  'nunca fica negativo',
+  'quantidade igual ao estoque zera exatamente, nao fica negativo',
+  lib.baixarEstoque(produtos, [{ produtoId: 'prod-002', quantidade: 7 }]).find((x) => x.id === 'prod-002').estoque,
+  0,
+);
+conferir(
+  'quantidade acima do estoque tambem para em zero, nunca negativo',
   lib.baixarEstoque(produtos, [{ produtoId: 'prod-006', quantidade: 99 }]).find((x) => x.id === 'prod-006').estoque,
   0,
+);
+conferir(
+  'produto ja esgotado (estoque 0) continua em zero, nao vira negativo',
+  lib.baixarEstoque(produtos, [{ produtoId: 'prod-008', quantidade: 3 }]).find((x) => x.id === 'prod-008').estoque,
+  0,
+);
+conferir(
+  'nenhum produto no resultado fica com estoque negativo',
+  lib
+    .baixarEstoque(produtos, [
+      { produtoId: 'prod-001', quantidade: 999 },
+      { produtoId: 'prod-002', quantidade: 999 },
+      { produtoId: 'prod-006', quantidade: 999 },
+      { produtoId: 'prod-008', quantidade: 999 },
+      { produtoId: 'prod-009', quantidade: 999 },
+    ])
+    .every((x) => x.estoque === null || x.estoque >= 0),
+  true,
 );
 
 conferir('item fantasma e ignorado', lib.baixarEstoque(produtos, [{ produtoId: 'zzz', quantidade: 1 }]), produtos);
