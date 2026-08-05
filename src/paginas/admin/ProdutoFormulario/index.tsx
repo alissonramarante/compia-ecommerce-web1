@@ -14,7 +14,6 @@ import {
   type DadosDoFormulario,
   type ErrosDoFormulario,
 } from '../../../lib/produtoFormulario';
-import { criarLog } from '../../../lib/log';
 import { useProdutos } from '../../../hooks/useProdutos';
 import { useSessao } from '../../../hooks/useSessao';
 import { useLogs } from '../../../hooks/useLogs';
@@ -72,7 +71,7 @@ function ProdutoFormulario() {
   const navegar = useNavigate();
   const { produtos, produtoPorId, salvarProduto } = useProdutos();
   const { usuarioCorrente } = useSessao();
-  const { logs, adicionarLog } = useLogs();
+  const { registrarLog } = useLogs();
 
   const produtoExistente = id !== undefined ? produtoPorId(id) : undefined;
   const editando = id !== undefined;
@@ -155,20 +154,17 @@ function ProdutoFormulario() {
 
     // AreaProtegida (area="produtos" exigeEdicao) já garante usuarioCorrente não-nulo nesta rota.
     if (usuarioCorrente !== null) {
-      adicionarLog(
-        criarLog(
-          logs,
-          {
-            usuarioId: usuarioCorrente.id,
-            acao: editando ? 'produto_editado' : 'produto_criado',
-            entidade: 'produto',
-            entidadeId: produto.id,
-            descricao: editando
-              ? `Editou "${produto.titulo}"`
-              : `Cadastrou "${produto.titulo}"`,
-          },
-          new Date().toISOString(),
-        ),
+      registrarLog(
+        {
+          usuarioId: usuarioCorrente.id,
+          acao: editando ? 'produto_editado' : 'produto_criado',
+          entidade: 'produto',
+          entidadeId: produto.id,
+          descricao: editando
+            ? `Editou "${produto.titulo}"`
+            : `Cadastrou "${produto.titulo}"`,
+        },
+        new Date().toISOString(),
       );
     }
 

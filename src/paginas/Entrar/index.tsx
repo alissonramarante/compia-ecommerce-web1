@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { clientes } from '../../mocks';
 import { cidadeDoCliente, DOMINIO_DA_EQUIPE } from '../../lib/sessao';
 import { restaurarDemonstracao } from '../../lib/demonstracao';
-import { criarLog } from '../../lib/log';
 import { useSessao } from '../../hooks/useSessao';
 import { useLogs } from '../../hooks/useLogs';
 
@@ -14,7 +13,7 @@ const CLASSE_TITULO_DE_SECAO =
 function Entrar() {
   const { clienteCorrente, usuarioCorrente, entrarComoCliente, entrarComoUsuario, sairDaEquipe } =
     useSessao();
-  const { logs, adicionarLog } = useLogs();
+  const { registrarLog } = useLogs();
 
   /* Estado local do formulário: o e-mail digitado não é sessão, é rascunho. */
   const [email, setEmail] = useState('');
@@ -34,18 +33,15 @@ function Entrar() {
 
     const resultado = entrarComoUsuario(email);
     if (resultado.ok) {
-      adicionarLog(
-        criarLog(
-          logs,
-          {
-            usuarioId: resultado.usuario.id,
-            acao: 'login',
-            entidade: 'usuario',
-            entidadeId: resultado.usuario.id,
-            descricao: `${resultado.usuario.nome} entrou no painel administrativo.`,
-          },
-          new Date().toISOString(),
-        ),
+      registrarLog(
+        {
+          usuarioId: resultado.usuario.id,
+          acao: 'login',
+          entidade: 'usuario',
+          entidadeId: resultado.usuario.id,
+          descricao: `${resultado.usuario.nome} entrou no painel administrativo.`,
+        },
+        new Date().toISOString(),
       );
       setEmail('');
       setErro('');
@@ -59,18 +55,15 @@ function Entrar() {
      chamada a sessão já está sem equipe. */
   const aoSair = () => {
     if (usuarioCorrente !== null) {
-      adicionarLog(
-        criarLog(
-          logs,
-          {
-            usuarioId: usuarioCorrente.id,
-            acao: 'logout',
-            entidade: 'usuario',
-            entidadeId: usuarioCorrente.id,
-            descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
-          },
-          new Date().toISOString(),
-        ),
+      registrarLog(
+        {
+          usuarioId: usuarioCorrente.id,
+          acao: 'logout',
+          entidade: 'usuario',
+          entidadeId: usuarioCorrente.id,
+          descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
+        },
+        new Date().toISOString(),
       );
     }
 

@@ -2,7 +2,6 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 
 import { ROTULO_DE_AREA, areasVisiveis, type AreaAdmin } from '../lib/permissoes';
-import { criarLog } from '../lib/log';
 import { useSessao } from '../hooks/useSessao';
 import { useLogs } from '../hooks/useLogs';
 
@@ -26,7 +25,7 @@ const CLASSE_LINK_DE_AREA =
  */
 function LayoutAdmin() {
   const { usuarioCorrente, sairDaEquipe } = useSessao();
-  const { logs, adicionarLog } = useLogs();
+  const { registrarLog } = useLogs();
 
   // AreaProtegida (sem `area`) já garante isto antes de LayoutAdmin renderizar.
   if (usuarioCorrente === null) return null;
@@ -34,18 +33,15 @@ function LayoutAdmin() {
   const areas = areasVisiveis(usuarioCorrente.perfil);
 
   const aoSair = () => {
-    adicionarLog(
-      criarLog(
-        logs,
-        {
-          usuarioId: usuarioCorrente.id,
-          acao: 'logout',
-          entidade: 'usuario',
-          entidadeId: usuarioCorrente.id,
-          descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
-        },
-        new Date().toISOString(),
-      ),
+    registrarLog(
+      {
+        usuarioId: usuarioCorrente.id,
+        acao: 'logout',
+        entidade: 'usuario',
+        entidadeId: usuarioCorrente.id,
+        descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
+      },
+      new Date().toISOString(),
     );
     sairDaEquipe();
   };

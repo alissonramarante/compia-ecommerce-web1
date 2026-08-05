@@ -2,32 +2,57 @@ import { createContext, useEffect, useMemo, useReducer, type ReactNode } from 'r
 
 import type { LogAtividade } from '../types';
 import { logs as logsIniciais } from '../mocks';
+import { maiorNumeroDeLog, type DadosDoLog } from '../lib/log';
 import { carregarLogs, salvar } from '../lib/logsArmazenados';
 
 export interface EstadoLogs {
   logs: LogAtividade[];
+  /**
+   * Contador monotônico dos ids — nunca decresce. Mesmo padrão de
+   * `sequenciaDeAvisos` no `CarrinhoContext`: reler `logs.length` (ou reler
+   * a lista inteira, como fazia a antiga `gerarIdDeLog`) falha exatamente
+   * quando dois logs são despachados no mesmo manipulador de evento — a
+   * mudança de status e o e-mail de confirmação, por exemplo — porque o
+   * segundo despacho ainda vê a lista de antes do primeiro.
+   */
+  proximoNumero: number;
 }
 
-export type AcaoLogs = { tipo: 'adicionar'; log: LogAtividade };
+export type AcaoLogs = { tipo: 'adicionar'; dados: DadosDoLog; em: string };
 
 /**
- * Reducer puro: sem `localStorage`, sem relógio — o registro já chega
- * pronto (`lib/log.ts` monta o objeto, a página decide quando chamar).
+ * Reducer puro: sem `localStorage`. O id nasce aqui, do contador em
+ * estado — nunca de reler a lista, que o reducer não tem motivo para fazer
+ * já que o contador é a fonte da verdade.
  */
 export function reducerLogs(estado: EstadoLogs, acao: AcaoLogs): EstadoLogs {
   switch (acao.tipo) {
-    case 'adicionar':
-      return { logs: [...estado.logs, acao.log] };
+    case 'adicionar': {
+      const log: LogAtividade = {
+        id: `log-${String(estado.proximoNumero).padStart(3, '0')}`,
+        usuarioId: acao.dados.usuarioId,
+        acao: acao.dados.acao,
+        entidade: acao.dados.entidade,
+        ...(acao.dados.entidadeId === undefined ? {} : { entidadeId: acao.dados.entidadeId }),
+        descricao: acao.dados.descricao,
+        em: acao.em,
+      };
+
+      return { logs: [...estado.logs, log], proximoNumero: estado.proximoNumero + 1 };
+    }
   }
 }
 
 export function criarEstadoInicial(): EstadoLogs {
-  return { logs: carregarLogs(logsIniciais) };
+  const logs = carregarLogs(logsIniciais);
+
+  return { logs, proximoNumero: maiorNumeroDeLog(logs) + 1 };
 }
 
 export interface ValorDosLogs {
   logs: LogAtividade[];
-  adicionarLog: (log: LogAtividade) => void;
+  /** `em` por parâmetro, como em toda escrita do projeto: quem chama decide a hora. */
+  registrarLog: (dados: DadosDoLog, em: string) => void;
 }
 
 export const LogsContext = createContext<ValorDosLogs | null>(null);
@@ -49,7 +74,7 @@ function LogsProvider({ children }: Props) {
   const valor = useMemo<ValorDosLogs>(
     () => ({
       logs: estado.logs,
-      adicionarLog: (log) => despachar({ tipo: 'adicionar', log }),
+      registrarLog: (dados, em) => despachar({ tipo: 'adicionar', dados, em }),
     }),
     [estado.logs],
   );

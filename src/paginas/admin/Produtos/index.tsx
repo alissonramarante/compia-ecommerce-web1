@@ -13,7 +13,6 @@ import {
 import { kitsQueReferenciam } from '../../../lib/produto';
 import { formatarMoeda } from '../../../lib/formatadores';
 import { podeEditar } from '../../../lib/permissoes';
-import { criarLog } from '../../../lib/log';
 import { useProdutos } from '../../../hooks/useProdutos';
 import { useSessao } from '../../../hooks/useSessao';
 import { useLogs } from '../../../hooks/useLogs';
@@ -46,7 +45,7 @@ function Produtos() {
   const [parametros, setParametros] = useSearchParams();
   const { produtos, excluirProduto } = useProdutos();
   const { usuarioCorrente } = useSessao();
-  const { logs, adicionarLog } = useLogs();
+  const { registrarLog } = useLogs();
 
   // AreaProtegida já garante usuarioCorrente não-nulo nesta rota.
   const podeGerenciar = usuarioCorrente !== null && podeEditar(usuarioCorrente.perfil, 'produtos');
@@ -93,18 +92,15 @@ function Produtos() {
 
     // AreaProtegida (area="produtos" exigeEdicao) já garante usuarioCorrente não-nulo nesta rota.
     if (usuarioCorrente !== null) {
-      adicionarLog(
-        criarLog(
-          logs,
-          {
-            usuarioId: usuarioCorrente.id,
-            acao: 'produto_excluido',
-            entidade: 'produto',
-            entidadeId: produtoEmExclusao.id,
-            descricao: `Excluiu "${produtoEmExclusao.titulo}"`,
-          },
-          new Date().toISOString(),
-        ),
+      registrarLog(
+        {
+          usuarioId: usuarioCorrente.id,
+          acao: 'produto_excluido',
+          entidade: 'produto',
+          entidadeId: produtoEmExclusao.id,
+          descricao: `Excluiu "${produtoEmExclusao.titulo}"`,
+        },
+        new Date().toISOString(),
       );
     }
 

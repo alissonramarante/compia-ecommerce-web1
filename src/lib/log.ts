@@ -20,24 +20,30 @@ export const ROTULO_DE_ACAO: Record<AcaoLog, string> = {
 /* ------------------------------------------------------------------ */
 
 /**
- * Sequencial a partir do maior `log-NNN` já usado — mesma família de
- * `gerarNumeroPedido` e `gerarIdDeProduto`.
+ * Maior sufixo numérico entre os `log-NNN` existentes. Usada só uma vez, na
+ * carga inicial do `LogsContext`, para o contador do reducer (`proximoNumero`)
+ * continuar de onde a semente parou — depois disso quem numera é o reducer,
+ * não esta função.
+ *
+ * Reler a lista a cada registro (como uma `gerarIdDeLog` faria) é exatamente
+ * o bug que motivou o contador em estado: dois logs despachados no mesmo
+ * manipulador de evento — mudança de status e o e-mail de confirmação, por
+ * exemplo — veriam a mesma lista (o closure só atualiza no próximo render)
+ * e sairiam com o mesmo id.
  *
  * Testes de mesa:
- *   gerarIdDeLog(logs)                          → 'log-004' (mocks vão até log-003)
- *   gerarIdDeLog([])                            → 'log-001'
- *   gerarIdDeLog([{id:'log-005'},{id:'log-002'}]) → 'log-006'
+ *   maiorNumeroDeLog(logs)                            → 3 (mocks vão até log-003)
+ *   maiorNumeroDeLog([])                              → 0
+ *   maiorNumeroDeLog([{id:'log-005'},{id:'log-002'}]) → 5
  *   id malformado ('log-abc') é ignorado
  */
-export function gerarIdDeLog(logs: { id: string }[]): string {
-  const maior = logs.reduce((maximo, log) => {
+export function maiorNumeroDeLog(logs: { id: string }[]): number {
+  return logs.reduce((maximo, log) => {
     const combinacao = /^log-(\d+)$/.exec(log.id);
     if (combinacao === null) return maximo;
 
     return Math.max(maximo, Number(combinacao[1]));
   }, 0);
-
-  return `log-${String(maior + 1).padStart(3, '0')}`;
 }
 
 export interface DadosDoLog {
@@ -47,32 +53,6 @@ export interface DadosDoLog {
   entidade: string;
   entidadeId?: string;
   descricao: string;
-}
-
-/**
- * Monta o registro pronto para `adicionarLog` — a página faz a chamada de
- * escrita, esta função só decide o formato. `agora` por parâmetro, como em
- * todo o projeto: nenhuma função pura lê o relógio.
- *
- * Testes de mesa:
- *   criarLog([], {usuarioId:'usr-001', acao:'login', entidade:'usuario', entidadeId:'usr-001', descricao:'Entrou'}, AGORA)
- *     → { id: 'log-001', usuarioId: 'usr-001', acao: 'login', entidade: 'usuario', entidadeId: 'usr-001', descricao: 'Entrou', em: AGORA }
- *   sem entidadeId → chave ausente no objeto, não string vazia
- */
-export function criarLog(
-  logsExistentes: LogAtividade[],
-  dados: DadosDoLog,
-  agora: string,
-): LogAtividade {
-  return {
-    id: gerarIdDeLog(logsExistentes),
-    usuarioId: dados.usuarioId,
-    acao: dados.acao,
-    entidade: dados.entidade,
-    ...(dados.entidadeId === undefined ? {} : { entidadeId: dados.entidadeId }),
-    descricao: dados.descricao,
-    em: agora,
-  };
 }
 
 /* ------------------------------------------------------------------ */

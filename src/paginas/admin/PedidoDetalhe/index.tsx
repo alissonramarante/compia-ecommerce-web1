@@ -12,7 +12,6 @@ import {
   transicoesValidas,
 } from '../../../lib/statusPedido';
 import { formatarCep, formatarData, formatarMoeda } from '../../../lib/formatadores';
-import { criarLog } from '../../../lib/log';
 import { usePedidos } from '../../../hooks/usePedidos';
 import { useProdutos } from '../../../hooks/useProdutos';
 import { useSessao } from '../../../hooks/useSessao';
@@ -39,7 +38,7 @@ function PedidoDetalhe() {
   const { pedidoPorNumero, atualizarPedido } = usePedidos();
   const { devolverEstoque } = useProdutos();
   const { usuarioCorrente } = useSessao();
-  const { logs, adicionarLog } = useLogs();
+  const { registrarLog } = useLogs();
   const confirmacaoDeEmail = useSinalTemporario(4000);
 
   const pedido = pedidoPorNumero(numero ?? '');
@@ -98,8 +97,10 @@ function PedidoDetalhe() {
 
     // AreaProtegida (area="pedidos") já garante usuarioCorrente não-nulo nesta rota.
     if (usuarioCorrente !== null) {
-      const logDeStatus = criarLog(
-        logs,
+      // Os dois despachos vão para o mesmo reducer, que atribui o id a partir
+      // de um contador em estado — não precisa (nem pode) saber aqui se o
+      // primeiro "já foi visto" pelo segundo.
+      registrarLog(
         {
           usuarioId: usuarioCorrente.id,
           acao: 'pedido_status_alterado',
@@ -109,23 +110,17 @@ function PedidoDetalhe() {
         },
         agora,
       );
-      adicionarLog(logDeStatus);
 
-      // `logs` ainda não tem `logDeStatus` (o despacho acima é assíncrono) —
-      // passa a lista com ele já incluído para o próximo id não colidir.
       if (cliente !== undefined) {
-        adicionarLog(
-          criarLog(
-            [...logs, logDeStatus],
-            {
-              usuarioId: usuarioCorrente.id,
-              acao: 'email_enviado',
-              entidade: 'pedido',
-              entidadeId: pedido.id,
-              descricao: `${mensagemDeEmailEnviado(cliente.email)} (pedido ${pedido.numero})`,
-            },
-            agora,
-          ),
+        registrarLog(
+          {
+            usuarioId: usuarioCorrente.id,
+            acao: 'email_enviado',
+            entidade: 'pedido',
+            entidadeId: pedido.id,
+            descricao: `${mensagemDeEmailEnviado(cliente.email)} (pedido ${pedido.numero})`,
+          },
+          agora,
         );
       }
     }
