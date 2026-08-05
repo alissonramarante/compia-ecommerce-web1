@@ -180,7 +180,6 @@ azul        #23319E   ações primárias, links
 riso        #FF4F7B   acento único: promoção, badge, foco — só como bg-*
 ocre        #D9A521   alertas e estoque baixo — só como bg-*
 grafite     #5C6670   texto secundário, bordas
-riso-texto  #BE3A5C   riso legível em texto — 4,63:1 sobre papel, 5,32:1 sobre white
 ocre-texto  #8A6414   ocre legível em texto — 4,67:1 sobre papel, 5,37:1 sobre white
 ```
 
@@ -194,11 +193,13 @@ direto sobre `papel` ou `white` não passam de ~2,8:1 — abaixo do mínimo WCAG
 AA (4,5:1 para texto normal, 3:1 para texto grande e componentes de
 interface), calculado pela fórmula de luminância relativa, não estimado. Os
 dois só valem como **preenchimento** (`bg-riso`, `bg-ocre`) com `text-tinta`
-por cima — aí passam de 5,8:1. Para escrever nessa família de cor — erro de
-campo, estoque baixo, indicador de status — use `riso-texto`/`ocre-texto`:
-mesma matiz, escurecida até garantir 4,5:1 contra os dois fundos claros do
-tema. `riso-texto`/`ocre-texto` nunca vão como `bg-*` — são versões escuras
-só para leitura, o contrário anularia o acento.
+por cima — aí passam de 5,8:1. `riso` **nunca** escreve: não existe
+`riso-texto`, de propósito — é o único acento promocional da tela e não tem
+saída para virar texto sem deixar de ser "o" acento. `ocre` é semântico
+(estoque baixo, erro de campo, indicador de status) e precisa escrever, não
+só preencher: use `ocre-texto`, mesma matiz, escurecida até garantir 4,5:1
+contra os dois fundos claros do tema. `ocre-texto` nunca vai como `bg-*` — é
+versão escura só para leitura, o contrário anularia o acento.
 
 Tipografia (Google Fonts):
 

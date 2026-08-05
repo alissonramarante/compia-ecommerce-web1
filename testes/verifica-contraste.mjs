@@ -10,9 +10,11 @@ const { conferir, caso, secao, encerrar } = criarPlacar();
  * componentes de interface.
  *
  * "Cor saturada preenche, cor escura escreve" — ver CLAUDE.md § Direção
- * visual: `riso`/`ocre` só valem como `bg-*` com `text-tinta` por cima;
- * `riso-texto`/`ocre-texto` são as versões escurecidas para `text-*` direto
- * sobre fundo claro.
+ * visual: `riso` só vale como `bg-riso` com `text-tinta` por cima, nunca como
+ * texto — não existe `riso-texto`, de propósito, para não afrouxar a regra.
+ * `ocre` tem a mesma restrição, mas com uma saída: `ocre-texto` é a versão
+ * escurecida para `text-*` direto sobre fundo claro, porque estoque baixo e
+ * erro de campo precisam escrever nessa cor, não só preencher um selo.
  */
 
 const MINIMO_TEXTO = 4.5;
@@ -20,7 +22,7 @@ const MINIMO_TEXTO = 4.5;
 /* ============ 1. Cores de texto sobre os dois fundos claros do tema ============ */
 secao('texto sobre papel/white — ≥ 4.5:1');
 
-const CORES_DE_TEXTO = ['tinta', 'azul', 'grafite', 'riso-texto', 'ocre-texto'];
+const CORES_DE_TEXTO = ['tinta', 'azul', 'grafite', 'ocre-texto'];
 const FUNDOS_CLAROS = ['papel', 'white'];
 
 for (const cor of CORES_DE_TEXTO) {
@@ -35,8 +37,8 @@ for (const cor of CORES_DE_TEXTO) {
 }
 
 /* ============ 2. Regressão: riso/ocre puros continuam abaixo do mínimo como texto ============ */
-secao('riso/ocre puros continuam reprovando como texto (por isso existem as versões -texto)');
-conferir('riso sobre papel < 4.5 (por isso riso-texto existe)', razaoDeContraste(TOKENS.riso, TOKENS.papel) < MINIMO_TEXTO, true);
+secao('riso/ocre puros continuam reprovando como texto');
+conferir('riso sobre papel < 4.5 (por isso riso nunca vira texto, só bg-riso)', razaoDeContraste(TOKENS.riso, TOKENS.papel) < MINIMO_TEXTO, true);
 conferir('ocre sobre papel < 4.5 (por isso ocre-texto existe)', razaoDeContraste(TOKENS.ocre, TOKENS.papel) < MINIMO_TEXTO, true);
 
 /* ============ 3. Preenchimento (bg-riso/bg-ocre) com texto tinta por cima ============ */
@@ -44,20 +46,16 @@ secao('tinta sobre riso/ocre (selo, badge) — ≥ 4.5:1');
 conferir('tinta sobre riso', razaoDeContraste(TOKENS.tinta, TOKENS.riso) >= MINIMO_TEXTO, true);
 conferir('tinta sobre ocre', razaoDeContraste(TOKENS.tinta, TOKENS.ocre) >= MINIMO_TEXTO, true);
 
-/* ============ 4. As duas cores novas realmente batem o mínimo pedido ============ */
-secao('riso-texto / ocre-texto — razões exatas (reportadas na Tarefa 1)');
-const razaoRisoTextoPapel = razaoDeContraste(TOKENS['riso-texto'], TOKENS.papel);
-const razaoRisoTextoWhite = razaoDeContraste(TOKENS['riso-texto'], TOKENS.white);
+/* ============ 4. ocre-texto realmente bate o mínimo pedido ============ */
+secao('ocre-texto — razões exatas (reportadas na Tarefa 1)');
 const razaoOcreTextoPapel = razaoDeContraste(TOKENS['ocre-texto'], TOKENS.papel);
 const razaoOcreTextoWhite = razaoDeContraste(TOKENS['ocre-texto'], TOKENS.white);
 
-caso(`riso-texto sobre papel = ${razaoRisoTextoPapel.toFixed(2)}:1 (≥ 4.5)`, razaoRisoTextoPapel >= MINIMO_TEXTO);
-caso(`riso-texto sobre white = ${razaoRisoTextoWhite.toFixed(2)}:1 (≥ 4.5)`, razaoRisoTextoWhite >= MINIMO_TEXTO);
 caso(`ocre-texto sobre papel = ${razaoOcreTextoPapel.toFixed(2)}:1 (≥ 4.5)`, razaoOcreTextoPapel >= MINIMO_TEXTO);
 caso(`ocre-texto sobre white = ${razaoOcreTextoWhite.toFixed(2)}:1 (≥ 4.5)`, razaoOcreTextoWhite >= MINIMO_TEXTO);
 
-/* ============ 5. Guarda estrutural: nenhum text-riso/text-ocre puro sobrou no código ============ */
-secao('nenhum text-riso/text-ocre puro em src/ (guarda de regressão)');
+/* ============ 5. Guarda estrutural: nenhum text-riso e nenhum text-ocre puro sobrou no código ============ */
+secao('nenhum text-riso (em nenhuma forma) nem text-ocre puro em src/ (guarda de regressão)');
 
 /** Varre `src/**\/*.tsx` recursivamente — sem depender de nenhuma lib de glob. */
 function listarArquivosTsx(dir) {
@@ -70,10 +68,17 @@ function listarArquivosTsx(dir) {
   return arquivos;
 }
 
-const PADRAO_TEXTO_PURO = /text-(riso|ocre)(?!-texto)(?=["'\s])/;
-const arquivosComTextoPuro = listarArquivosTsx(join(RAIZ, 'src'))
-  .filter((caminho) => PADRAO_TEXTO_PURO.test(readFileSync(caminho, 'utf8')));
+/* `riso` não tem versão de texto: qualquer `text-riso`, inclusive um
+   hipotético `text-riso-texto` digitado por engano, é erro. `ocre` só barra
+   a forma pura — `ocre-texto` é a saída válida. */
+const PADRAO_RISO_COMO_TEXTO = /text-riso(?![a-zA-Z])/;
+const PADRAO_OCRE_PURO_COMO_TEXTO = /text-ocre(?!-texto)(?![a-zA-Z])/;
 
-conferir('nenhum arquivo usa text-riso/text-ocre sem -texto', arquivosComTextoPuro, []);
+const arquivosTsx = listarArquivosTsx(join(RAIZ, 'src'));
+const arquivosComRisoDeTexto = arquivosTsx.filter((caminho) => PADRAO_RISO_COMO_TEXTO.test(readFileSync(caminho, 'utf8')));
+const arquivosComOcreTextoPuro = arquivosTsx.filter((caminho) => PADRAO_OCRE_PURO_COMO_TEXTO.test(readFileSync(caminho, 'utf8')));
+
+conferir('nenhum arquivo usa text-riso em qualquer forma', arquivosComRisoDeTexto, []);
+conferir('nenhum arquivo usa text-ocre sem -texto', arquivosComOcreTextoPuro, []);
 
 encerrar();

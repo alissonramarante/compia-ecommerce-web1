@@ -92,7 +92,6 @@ export const TOKENS = {
   riso: '#FF4F7B',
   ocre: '#D9A521',
   grafite: '#5C6670',
-  'riso-texto': '#BE3A5C',
   'ocre-texto': '#8A6414',
   white: '#FFFFFF',
   black: '#000000',
