@@ -5,6 +5,8 @@ import PedidosProvider from './contexts/PedidosContext';
 import ProdutosProvider from './contexts/ProdutosContext';
 import SessaoProvider from './contexts/SessaoContext';
 import Layout from './components/Layout';
+import LayoutAdmin from './components/LayoutAdmin';
+import AreaProtegida from './components/AreaProtegida';
 import Inicio from './paginas/Inicio';
 import Catalogo from './paginas/Catalogo';
 import Produto from './paginas/Produto';
@@ -20,8 +22,10 @@ import AdminPedidos from './paginas/admin/Pedidos';
 import AdminLogs from './paginas/admin/Logs';
 
 /**
- * Todas as rotas da especificação, todas dentro da mesma casca.
- * A proteção por perfil do /admin entra na Fatia 7.
+ * Duas cascas: a da loja (`Layout`) e a do painel (`LayoutAdmin`), parentes
+ * mas não a mesma identidade visual. `AreaProtegida` guarda cada rota de
+ * `/admin` — a de fora exige só estar logado como equipe (o próprio painel
+ * não tem área específica), as de dentro exigem a área correspondente.
  */
 function App() {
   return (
@@ -40,12 +44,42 @@ function App() {
                 <Route path="/conta" element={<Conta />} />
                 <Route path="/entrar" element={<Entrar />} />
 
-                <Route path="/admin" element={<AdminPainel />} />
-                <Route path="/admin/produtos" element={<AdminProdutos />} />
-                <Route path="/admin/pedidos" element={<AdminPedidos />} />
-                <Route path="/admin/logs" element={<AdminLogs />} />
-
                 <Route path="*" element={<NaoEncontrada />} />
+              </Route>
+
+              <Route
+                path="/admin"
+                element={
+                  <AreaProtegida>
+                    <LayoutAdmin />
+                  </AreaProtegida>
+                }
+              >
+                <Route index element={<AdminPainel />} />
+                <Route
+                  path="produtos"
+                  element={
+                    <AreaProtegida area="produtos">
+                      <AdminProdutos />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="pedidos"
+                  element={
+                    <AreaProtegida area="pedidos">
+                      <AdminPedidos />
+                    </AreaProtegida>
+                  }
+                />
+                <Route
+                  path="logs"
+                  element={
+                    <AreaProtegida area="logs">
+                      <AdminLogs />
+                    </AreaProtegida>
+                  }
+                />
               </Route>
             </Routes>
           </CarrinhoProvider>

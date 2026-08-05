@@ -6,6 +6,8 @@ import PedidosProvider from '../src/contexts/PedidosContext.tsx';
 import ProdutosProvider from '../src/contexts/ProdutosContext.tsx';
 import CarrinhoProvider from '../src/contexts/CarrinhoContext.tsx';
 import Layout from '../src/components/Layout.tsx';
+import LayoutAdmin from '../src/components/LayoutAdmin.tsx';
+import AreaProtegida from '../src/components/AreaProtegida.tsx';
 
 import Inicio from '../src/paginas/Inicio/index.tsx';
 import Catalogo from '../src/paginas/Catalogo/index.tsx';
@@ -16,6 +18,10 @@ import Pedido from '../src/paginas/Pedido/index.tsx';
 import Conta from '../src/paginas/Conta/index.tsx';
 import Entrar from '../src/paginas/Entrar/index.tsx';
 import NaoEncontrada from '../src/paginas/NaoEncontrada/index.tsx';
+import AdminPainel from '../src/paginas/admin/Painel/index.tsx';
+import AdminProdutos from '../src/paginas/admin/Produtos/index.tsx';
+import AdminPedidos from '../src/paginas/admin/Pedidos/index.tsx';
+import AdminLogs from '../src/paginas/admin/Logs/index.tsx';
 
 /**
  * Arnês único de renderização das suítes.
@@ -114,6 +120,46 @@ function Rotas() {
   );
 }
 
+/** Casca própria do painel, sempre presente — independe de `comLayout`. */
+function RotasAdmin() {
+  return (
+    <Route
+      path="/admin"
+      element={
+        <AreaProtegida>
+          <LayoutAdmin />
+        </AreaProtegida>
+      }
+    >
+      <Route index element={<AdminPainel />} />
+      <Route
+        path="produtos"
+        element={
+          <AreaProtegida area="produtos">
+            <AdminProdutos />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="pedidos"
+        element={
+          <AreaProtegida area="pedidos">
+            <AdminPedidos />
+          </AreaProtegida>
+        }
+      />
+      <Route
+        path="logs"
+        element={
+          <AreaProtegida area="logs">
+            <AdminLogs />
+          </AreaProtegida>
+        }
+      />
+    </Route>
+  );
+}
+
 export function renderizarComProvedores(rota: string, opcoes: Opcoes = {}): string {
   prepararArmazenamento(opcoes);
 
@@ -129,7 +175,10 @@ export function renderizarComProvedores(rota: string, opcoes: Opcoes = {}): stri
         <ProdutosProvider>
           <CarrinhoProvider>
             <MemoryRouter initialEntries={[rota]}>
-              <Routes>{rotas}</Routes>
+              <Routes>
+                {rotas}
+                {RotasAdmin()}
+              </Routes>
             </MemoryRouter>
           </CarrinhoProvider>
         </ProdutosProvider>

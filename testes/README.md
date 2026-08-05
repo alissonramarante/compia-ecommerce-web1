@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as dezoito em sequência
+npm run testes              # roda as vinte em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -26,12 +26,14 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-conta` | `lib/conta`: abas, tempo restante do PIX, agregação de downloads em cotas independentes, recompra com item indisponível, máscara de CPF |
 | `verifica-checkout` | `lib/checkout`: quais passos existem, guarda de passo pela URL, validação de endereço e cartão, máscaras, cobrança PIX vencida e renovação |
 | `verifica-pedido` | `lib/pedido`, `lib/pedidosArmazenados` e o reducer: numeração sequencial, congelamento de título e tipo, as quatro transições de `aplicarPagamento` |
+| `verifica-permissoes` | `lib/permissoes`: matriz perfil × área, `podeVer`, `podeEditar`, `areasVisiveis`, consistência (nunca edita o que não vê) |
 | `verifica-render` | Tela do catálogo: contagens, filtros vindos da URL, estado vazio |
 | `verifica-produto-render` | Tela do produto: ficha CIP, selos, kit, e-book, esgotado, slug inexistente |
 | `verifica-carrinho-render` | Tela do carrinho: tabela, resumo, avisos, contador do cabeçalho |
 | `verifica-entrar-render` | Tela de entrar: seletor de cliente, acesso da equipe, cabeçalho |
 | `verifica-conta-render` | As três abas da conta, aba inválida, PIX em aberto e expirado, estado vazio, cota zerada, CPF mascarado |
 | `verifica-checkout-render` | Telas de checkout e pedido: os quatro passos, guarda por URL, frete grátis, PIX vencido e em aberto, downloads, pedido inexistente |
+| `verifica-admin-render` | `AreaProtegida` e `LayoutAdmin`: tela de acesso restrito sem equipe logada, tela de acesso negado por área com o perfil e o que ele alcança, menu do painel variando por perfil, e a rota direta continuando protegida mesmo com o item escondido do menu |
 
 ## Arquitetura
 
