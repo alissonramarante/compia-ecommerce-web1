@@ -365,3 +365,19 @@ export function contarPorCategoria(produtos: Produto[]): Record<string, number> 
 
   return contagem;
 }
+
+/* ------------------------------------------------------------------ */
+/* 7. Painel administrativo                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Quantos produtos estão esgotados — `estoque === 0`, nunca `null`
+ * (ilimitado, e-book) nem positivo. Usado pelo painel do admin.
+ *
+ * Testes de mesa (sobre os 10 produtos do mock):
+ *   contarEsgotados(produtos) → 1 (prod-008)
+ *   contarEsgotados([])       → 0
+ */
+export function contarEsgotados(produtos: Produto[]): number {
+  return produtos.filter((produto) => produto.estoque === 0).length;
+}

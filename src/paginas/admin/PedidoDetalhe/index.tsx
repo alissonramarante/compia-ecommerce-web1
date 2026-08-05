@@ -12,8 +12,11 @@ import {
   transicoesValidas,
 } from '../../../lib/statusPedido';
 import { formatarCep, formatarData, formatarMoeda } from '../../../lib/formatadores';
+import { criarLog } from '../../../lib/log';
 import { usePedidos } from '../../../hooks/usePedidos';
 import { useProdutos } from '../../../hooks/useProdutos';
+import { useSessao } from '../../../hooks/useSessao';
+import { useLogs } from '../../../hooks/useLogs';
 import { useSinalTemporario } from '../../../hooks/useSinalTemporario';
 
 const CLASSE_TITULO = 'font-display text-sm font-bold uppercase tracking-widest text-tinta';
@@ -28,13 +31,15 @@ const CLASSE_CAMPO = 'mt-2 w-full border border-grafite/40 bg-white px-3 py-2 te
  * `lib/statusPedido.ts` decide, esta página só desenha as opções que ela
  * devolve. `enviado` exige código de rastreio antes de confirmar.
  *
- * O e-mail de confirmação é simulado: um toast aparece, mas nada é
- * registrado em log ainda — o `LogsContext` só existe a partir da Tarefa 4.
+ * O e-mail de confirmação é simulado: um toast aparece, e a mudança de
+ * status e o envio simulado do e-mail geram um `LogAtividade` cada.
  */
 function PedidoDetalhe() {
   const { numero } = useParams();
   const { pedidoPorNumero, atualizarPedido } = usePedidos();
   const { devolverEstoque } = useProdutos();
+  const { usuarioCorrente } = useSessao();
+  const { logs, adicionarLog } = useLogs();
   const confirmacaoDeEmail = useSinalTemporario(4000);
 
   const pedido = pedidoPorNumero(numero ?? '');
@@ -90,6 +95,41 @@ function PedidoDetalhe() {
     }
 
     atualizarPedido(atualizado);
+
+    // AreaProtegida (area="pedidos") já garante usuarioCorrente não-nulo nesta rota.
+    if (usuarioCorrente !== null) {
+      const logDeStatus = criarLog(
+        logs,
+        {
+          usuarioId: usuarioCorrente.id,
+          acao: 'pedido_status_alterado',
+          entidade: 'pedido',
+          entidadeId: pedido.id,
+          descricao: `Pedido ${pedido.numero}: ${ROTULO_DE_STATUS[pedido.status]} → ${ROTULO_DE_STATUS[novoStatus]}`,
+        },
+        agora,
+      );
+      adicionarLog(logDeStatus);
+
+      // `logs` ainda não tem `logDeStatus` (o despacho acima é assíncrono) —
+      // passa a lista com ele já incluído para o próximo id não colidir.
+      if (cliente !== undefined) {
+        adicionarLog(
+          criarLog(
+            [...logs, logDeStatus],
+            {
+              usuarioId: usuarioCorrente.id,
+              acao: 'email_enviado',
+              entidade: 'pedido',
+              entidadeId: pedido.id,
+              descricao: `${mensagemDeEmailEnviado(cliente.email)} (pedido ${pedido.numero})`,
+            },
+            agora,
+          ),
+        );
+      }
+    }
+
     setErro('');
     setNovoStatus('');
     setCodigoRastreio('');

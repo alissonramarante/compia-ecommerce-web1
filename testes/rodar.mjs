@@ -31,6 +31,7 @@ const SUITES = [
   ['permissoes', 'verifica-permissoes.mjs', 'lib/permissoes: matriz perfil × área'],
   ['produto-formulario', 'verifica-produto-formulario.mjs', 'lib/produtoFormulario: slug, validação, montagem'],
   ['status-pedido', 'verifica-status-pedido.mjs', 'lib/statusPedido: máquina de transições, estoque no cancelamento'],
+  ['log', 'verifica-log.mjs', 'lib/log + logsArmazenados + reducer'],
   ['catalogo (tela)', 'verifica-render.mjs', 'renderização do catálogo'],
   ['produto (tela)', 'verifica-produto-render.mjs', 'renderização do produto'],
   ['carrinho (tela)', 'verifica-carrinho-render.mjs', 'renderização do carrinho'],
@@ -41,6 +42,8 @@ const SUITES = [
   ['admin produtos (tela)', 'verifica-admin-produtos-render.mjs', 'CRUD de produtos: lista, filtros, formulário por tipo'],
   ['admin pedidos (tela)', 'verifica-admin-pedidos-render.mjs', 'Lista, detalhe e mudança de status de pedidos'],
   ['admin clientes (tela)', 'verifica-admin-clientes-render.mjs', 'Acompanhamento de clientes, somente leitura'],
+  ['admin logs (tela)', 'verifica-admin-logs-render.mjs', 'Registro de atividade: filtros, ordenação, só admin'],
+  ['admin painel (tela)', 'verifica-admin-painel-render.mjs', 'Números do painel por permissão do perfil'],
 ];
 
 const detalhado = process.argv.includes('--detalhado');

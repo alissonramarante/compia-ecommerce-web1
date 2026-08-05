@@ -1,7 +1,7 @@
 # Suítes de teste
 
 ```
-npm run testes              # roda as vinte e cinco em sequência
+npm run testes              # roda as vinte e oito em sequência
 npm run testes -- --detalhado   # mostra a saída de cada asserção
 node testes/verifica-carrinho.mjs   # roda uma só
 ```
@@ -25,10 +25,11 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-demonstracao` | `lib/demonstracao`: varredura de chaves por prefixo (inclusive uma chave que ainda não existe) e reset |
 | `verifica-conta` | `lib/conta`: abas, tempo restante do PIX, agregação de downloads em cotas independentes, recompra com item indisponível, máscara de CPF |
 | `verifica-checkout` | `lib/checkout`: quais passos existem, guarda de passo pela URL, validação de endereço e cartão, máscaras, cobrança PIX vencida e renovação |
-| `verifica-pedido` | `lib/pedido`, `lib/pedidosArmazenados` e o reducer: numeração sequencial, congelamento de título e tipo, as quatro transições de `aplicarPagamento`, `pedidoFoiPago`, `filtrarPedidos` (busca, status, cliente) e `resumoDoCliente` |
+| `verifica-pedido` | `lib/pedido`, `lib/pedidosArmazenados` e o reducer: numeração sequencial, congelamento de título e tipo, as quatro transições de `aplicarPagamento`, `pedidoFoiPago`, `filtrarPedidos` (busca, status, cliente), `resumoDoCliente`, `contarPedidosPorStatus` e `receitaDosPedidosPagos` |
 | `verifica-permissoes` | `lib/permissoes`: matriz perfil × área, `podeVer`, `podeEditar`, `areasVisiveis`, consistência (nunca edita o que não vê) |
 | `verifica-produto-formulario` | `lib/produtoFormulario`: `gerarSlug`, `proximoSlugAoMudarTitulo` (editar título não regenera slug publicado), `gerarIdDeProduto`, ida e volta `paraDadosDoFormulario`/`montarProduto`, validação por tipo (físico, e-book, kit), ficha "tudo ou nada", colisão de slug |
-| `verifica-status-pedido` | `lib/statusPedido`: matriz de transições válidas, `enviado` exige código de rastreio, `cancelamentoDevolveEstoque` (sim antes de enviado, não depois), `mudarStatus` grava evento e código de rastreio |
+| `verifica-status-pedido` | `lib/statusPedido`: matriz de transições válidas, os dois estados terminais não aceitam nenhuma transição (nem para si mesmos), `enviado` exige código de rastreio, `cancelamentoDevolveEstoque` (sim antes de enviado, não depois), `mudarStatus` grava evento e código de rastreio |
+| `verifica-log` | `lib/log`, `lib/logsArmazenados` e o reducer do `LogsContext`: `criarLog` monta o registro com id sequencial, `filtrarLogs` (ação, usuário, mais recente primeiro), persistência |
 | `verifica-render` | Tela do catálogo: contagens, filtros vindos da URL, estado vazio |
 | `verifica-produto-render` | Tela do produto: ficha CIP, selos, kit, e-book, esgotado, slug inexistente |
 | `verifica-carrinho-render` | Tela do carrinho: tabela, resumo, avisos, contador do cabeçalho |
@@ -39,6 +40,8 @@ resumo; com falha, despeja a saída da suíte que quebrou.
 | `verifica-admin-produtos-render` | CRUD de produtos: tabela com capa/tipo/preço/estoque/destaque, busca e filtro por tipo reaproveitando `lib/catalogo`, ações escondidas para `vendedor`, formulário de criar e editar variando por tipo (físico, e-book, kit), produto inexistente |
 | `verifica-admin-pedidos-render` | Lista de pedidos (busca, filtro por status, filtro por cliente vindo de `/admin/clientes`), detalhe (itens, entrega, pagamento, histórico), transições de status oferecidas variando pelo estado atual, `editor` barrado |
 | `verifica-admin-clientes-render` | Acompanhamento de clientes: dados derivados do `PedidosContext` (quantidade de pedidos, total gasto só nos pagos), CPF mascarado, link para os pedidos do cliente, somente leitura, `editor` barrado |
+| `verifica-admin-logs-render` | Registro de atividade: autor por nome, ação legível, mais recente primeiro, filtro por ação e por usuário, só `admin` acessa |
+| `verifica-admin-painel-render` | Números do painel variando por perfil (produtos/esgotados para todos que veem produtos, pedidos por status e receita só para quem vê pedidos), tudo derivado do contexto vivo |
 
 ## Arquitetura
 

@@ -60,9 +60,9 @@ caso('admin acessa /produtos/novo', adminEmProdutoNovo.includes('<form'));
 const adminEmPedidos = admin('/admin/pedidos', { clienteId: 'cli-001', usuarioId: 'usr-001' });
 caso('admin acessa pedidos', adminEmPedidos.includes('<table'));
 const adminEmLogs = admin('/admin/logs', { clienteId: 'cli-001', usuarioId: 'usr-001' });
-caso('admin acessa logs', adminEmLogs.includes('Admin · Logs'));
+caso('admin acessa logs', adminEmLogs.includes('<table'));
 const adminNoPainel = admin('/admin', { clienteId: 'cli-001', usuarioId: 'usr-001' });
-caso('admin acessa o painel', adminNoPainel.includes('Admin'));
+caso('admin acessa o painel', adminNoPainel.includes('Bem-vindo, Renata Coutinho.'));
 
 /* ============ 4. menu esconde, mas nao substitui a protecao ============ */
 secao('menu do painel por perfil');

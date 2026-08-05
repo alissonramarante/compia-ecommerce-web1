@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { clientes } from '../../mocks';
 import { cidadeDoCliente, DOMINIO_DA_EQUIPE } from '../../lib/sessao';
 import { restaurarDemonstracao } from '../../lib/demonstracao';
+import { criarLog } from '../../lib/log';
 import { useSessao } from '../../hooks/useSessao';
+import { useLogs } from '../../hooks/useLogs';
 
 const CLASSE_TITULO_DE_SECAO =
   'font-display text-lg font-bold tracking-tight text-tinta';
@@ -12,6 +14,7 @@ const CLASSE_TITULO_DE_SECAO =
 function Entrar() {
   const { clienteCorrente, usuarioCorrente, entrarComoCliente, entrarComoUsuario, sairDaEquipe } =
     useSessao();
+  const { logs, adicionarLog } = useLogs();
 
   /* Estado local do formulário: o e-mail digitado não é sessão, é rascunho. */
   const [email, setEmail] = useState('');
@@ -31,12 +34,47 @@ function Entrar() {
 
     const resultado = entrarComoUsuario(email);
     if (resultado.ok) {
+      adicionarLog(
+        criarLog(
+          logs,
+          {
+            usuarioId: resultado.usuario.id,
+            acao: 'login',
+            entidade: 'usuario',
+            entidadeId: resultado.usuario.id,
+            descricao: `${resultado.usuario.nome} entrou no painel administrativo.`,
+          },
+          new Date().toISOString(),
+        ),
+      );
       setEmail('');
       setErro('');
       return;
     }
 
     setErro(resultado.erro);
+  };
+
+  /* O registro precisa do usuarioCorrente de antes de sair — depois da
+     chamada a sessão já está sem equipe. */
+  const aoSair = () => {
+    if (usuarioCorrente !== null) {
+      adicionarLog(
+        criarLog(
+          logs,
+          {
+            usuarioId: usuarioCorrente.id,
+            acao: 'logout',
+            entidade: 'usuario',
+            entidadeId: usuarioCorrente.id,
+            descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
+          },
+          new Date().toISOString(),
+        ),
+      );
+    }
+
+    sairDaEquipe();
   };
 
   return (
@@ -171,7 +209,7 @@ function Entrar() {
               </Link>
               <button
                 type="button"
-                onClick={sairDaEquipe}
+                onClick={aoSair}
                 className="font-display text-sm text-azul hover:underline"
               >
                 Sair do acesso da equipe
@@ -187,11 +225,12 @@ function Entrar() {
 
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-grafite">
           Apaga <strong className="font-semibold text-tinta">todos os carrinhos</strong>,
-          a sessão salva e{' '}
+          a sessão salva,{' '}
           <strong className="font-semibold text-tinta">
             todos os pedidos criados nesta máquina
-          </strong>
-          . Os quatro pedidos, os dez produtos e os três clientes dos dados de exemplo
+          </strong>{' '}
+          e qualquer produto ou registro de atividade alterado. Os quatro pedidos, os dez
+          produtos, os três clientes e os três registros de atividade dos dados de exemplo
           voltam como estavam. A página recarrega em seguida.
         </p>
 

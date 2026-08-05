@@ -13,8 +13,10 @@ import {
 import { kitsQueReferenciam } from '../../../lib/produto';
 import { formatarMoeda } from '../../../lib/formatadores';
 import { podeEditar } from '../../../lib/permissoes';
+import { criarLog } from '../../../lib/log';
 import { useProdutos } from '../../../hooks/useProdutos';
 import { useSessao } from '../../../hooks/useSessao';
+import { useLogs } from '../../../hooks/useLogs';
 import CampoBusca from '../../../components/CampoBusca';
 
 const ROTULO_DE_TIPO: Record<TipoProduto, string> = {
@@ -44,6 +46,7 @@ function Produtos() {
   const [parametros, setParametros] = useSearchParams();
   const { produtos, excluirProduto } = useProdutos();
   const { usuarioCorrente } = useSessao();
+  const { logs, adicionarLog } = useLogs();
 
   // AreaProtegida já garante usuarioCorrente não-nulo nesta rota.
   const podeGerenciar = usuarioCorrente !== null && podeEditar(usuarioCorrente.perfil, 'produtos');
@@ -81,13 +84,32 @@ function Produtos() {
     setConfirmandoExclusao(produtoId);
   };
 
+  const produtoEmExclusao = produtos.find((produto) => produto.id === confirmandoExclusao);
+
   const confirmarExclusao = () => {
-    if (confirmandoExclusao === null) return;
+    if (confirmandoExclusao === null || produtoEmExclusao === undefined) return;
+
     excluirProduto(confirmandoExclusao);
+
+    // AreaProtegida (area="produtos" exigeEdicao) já garante usuarioCorrente não-nulo nesta rota.
+    if (usuarioCorrente !== null) {
+      adicionarLog(
+        criarLog(
+          logs,
+          {
+            usuarioId: usuarioCorrente.id,
+            acao: 'produto_excluido',
+            entidade: 'produto',
+            entidadeId: produtoEmExclusao.id,
+            descricao: `Excluiu "${produtoEmExclusao.titulo}"`,
+          },
+          new Date().toISOString(),
+        ),
+      );
+    }
+
     setConfirmandoExclusao(null);
   };
-
-  const produtoEmExclusao = produtos.find((produto) => produto.id === confirmandoExclusao);
 
   return (
     <div>

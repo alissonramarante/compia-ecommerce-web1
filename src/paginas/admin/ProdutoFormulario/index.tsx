@@ -14,7 +14,10 @@ import {
   type DadosDoFormulario,
   type ErrosDoFormulario,
 } from '../../../lib/produtoFormulario';
+import { criarLog } from '../../../lib/log';
 import { useProdutos } from '../../../hooks/useProdutos';
+import { useSessao } from '../../../hooks/useSessao';
+import { useLogs } from '../../../hooks/useLogs';
 
 const CLASSE_ROTULO = 'block font-display text-xs font-bold uppercase tracking-widest text-tinta';
 const CLASSE_CAMPO = 'mt-2 w-full border border-grafite/40 bg-white px-3 py-2 text-sm text-tinta';
@@ -68,6 +71,8 @@ function ProdutoFormulario() {
   const { id } = useParams();
   const navegar = useNavigate();
   const { produtos, produtoPorId, salvarProduto } = useProdutos();
+  const { usuarioCorrente } = useSessao();
+  const { logs, adicionarLog } = useLogs();
 
   const produtoExistente = id !== undefined ? produtoPorId(id) : undefined;
   const editando = id !== undefined;
@@ -147,6 +152,26 @@ function ProdutoFormulario() {
     });
 
     salvarProduto(produto);
+
+    // AreaProtegida (area="produtos" exigeEdicao) já garante usuarioCorrente não-nulo nesta rota.
+    if (usuarioCorrente !== null) {
+      adicionarLog(
+        criarLog(
+          logs,
+          {
+            usuarioId: usuarioCorrente.id,
+            acao: editando ? 'produto_editado' : 'produto_criado',
+            entidade: 'produto',
+            entidadeId: produto.id,
+            descricao: editando
+              ? `Editou "${produto.titulo}"`
+              : `Cadastrou "${produto.titulo}"`,
+          },
+          new Date().toISOString(),
+        ),
+      );
+    }
+
     navegar('/admin/produtos');
   };
 

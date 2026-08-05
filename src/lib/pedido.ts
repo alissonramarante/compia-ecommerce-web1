@@ -391,3 +391,55 @@ export function resumoDoCliente(
       .reduce((total, pedido) => total + pedido.total, 0),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* 7. Painel administrativo                                            */
+/* ------------------------------------------------------------------ */
+
+const TODOS_OS_STATUS: readonly StatusPedido[] = [
+  'aguardando_pagamento',
+  'pago',
+  'em_separacao',
+  'enviado',
+  'pronto_para_retirada',
+  'entregue',
+  'cancelado',
+];
+
+/**
+ * Quantos pedidos há em cada status — os sete sempre aparecem, mesmo com
+ * contagem zero, para o painel não precisar adivinhar quais existem.
+ *
+ * Testes de mesa (sobre os 4 pedidos do mock: 1 entregue, 1 enviado, 1
+ * aguardando_pagamento, 1 cancelado):
+ *   contarPedidosPorStatus(pedidos).entregue             → 1
+ *   contarPedidosPorStatus(pedidos).enviado               → 1
+ *   contarPedidosPorStatus(pedidos).pago                  → 0
+ *   contarPedidosPorStatus([]).cancelado                  → 0
+ */
+export function contarPedidosPorStatus(pedidos: Pedido[]): Record<StatusPedido, number> {
+  const contagem = Object.fromEntries(TODOS_OS_STATUS.map((status) => [status, 0])) as Record<
+    StatusPedido,
+    number
+  >;
+
+  for (const pedido of pedidos) {
+    contagem[pedido.status] += 1;
+  }
+
+  return contagem;
+}
+
+/**
+ * Soma do total dos pedidos pagos — a "receita" do painel. Reaproveita
+ * `pedidoFoiPago`: o mesmo critério usado em `resumoDoCliente`.
+ *
+ * Testes de mesa (sobre os 4 pedidos do mock):
+ *   receitaDosPedidosPagos(pedidos) → soma de ped-001 (entregue) e ped-002 (enviado)
+ *   receitaDosPedidosPagos([])      → 0
+ */
+export function receitaDosPedidosPagos(pedidos: Pedido[]): number {
+  return pedidos
+    .filter((pedido) => pedidoFoiPago(pedido.status))
+    .reduce((total, pedido) => total + pedido.total, 0);
+}

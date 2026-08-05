@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import SessaoProvider from '../src/contexts/SessaoContext.tsx';
 import PedidosProvider from '../src/contexts/PedidosContext.tsx';
 import ProdutosProvider from '../src/contexts/ProdutosContext.tsx';
+import LogsProvider from '../src/contexts/LogsContext.tsx';
 import CarrinhoProvider from '../src/contexts/CarrinhoContext.tsx';
 import Layout from '../src/components/Layout.tsx';
 import LayoutAdmin from '../src/components/LayoutAdmin.tsx';
@@ -46,6 +47,8 @@ interface Opcoes {
   pedidos?: unknown[];
   /** Semeia `compia:produtos:v1`. Ausente usa a semente dos mocks. */
   produtos?: unknown[];
+  /** Semeia `compia:logs:v1`. Ausente usa a semente dos mocks. */
+  logs?: unknown[];
   /** Grava chaves cruas, para testar conteúdo corrompido ou o formato antigo. */
   bruto?: Record<string, string>;
   /** `localStorage` inexistente (SSR). */
@@ -91,6 +94,10 @@ function prepararArmazenamento(opcoes: Opcoes): void {
 
   if (opcoes.produtos !== undefined) {
     dados['compia:produtos:v1'] = JSON.stringify(opcoes.produtos);
+  }
+
+  if (opcoes.logs !== undefined) {
+    dados['compia:logs:v1'] = JSON.stringify(opcoes.logs);
   }
 
   Object.assign(dados, opcoes.bruto ?? {});
@@ -206,18 +213,20 @@ export function renderizarComProvedores(rota: string, opcoes: Opcoes = {}): stri
 
   return renderToStaticMarkup(
     <SessaoProvider>
-      <PedidosProvider>
-        <ProdutosProvider>
-          <CarrinhoProvider>
-            <MemoryRouter initialEntries={[rota]}>
-              <Routes>
-                {rotas}
-                {RotasAdmin()}
-              </Routes>
-            </MemoryRouter>
-          </CarrinhoProvider>
-        </ProdutosProvider>
-      </PedidosProvider>
+      <LogsProvider>
+        <PedidosProvider>
+          <ProdutosProvider>
+            <CarrinhoProvider>
+              <MemoryRouter initialEntries={[rota]}>
+                <Routes>
+                  {rotas}
+                  {RotasAdmin()}
+                </Routes>
+              </MemoryRouter>
+            </CarrinhoProvider>
+          </ProdutosProvider>
+        </PedidosProvider>
+      </LogsProvider>
     </SessaoProvider>,
   );
 }

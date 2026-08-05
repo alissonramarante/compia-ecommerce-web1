@@ -2,7 +2,9 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 
 import { ROTULO_DE_AREA, areasVisiveis, type AreaAdmin } from '../lib/permissoes';
+import { criarLog } from '../lib/log';
 import { useSessao } from '../hooks/useSessao';
+import { useLogs } from '../hooks/useLogs';
 
 const ROTA_DA_AREA: Record<AreaAdmin, string> = {
   produtos: '/admin/produtos',
@@ -24,11 +26,29 @@ const CLASSE_LINK_DE_AREA =
  */
 function LayoutAdmin() {
   const { usuarioCorrente, sairDaEquipe } = useSessao();
+  const { logs, adicionarLog } = useLogs();
 
   // AreaProtegida (sem `area`) já garante isto antes de LayoutAdmin renderizar.
   if (usuarioCorrente === null) return null;
 
   const areas = areasVisiveis(usuarioCorrente.perfil);
+
+  const aoSair = () => {
+    adicionarLog(
+      criarLog(
+        logs,
+        {
+          usuarioId: usuarioCorrente.id,
+          acao: 'logout',
+          entidade: 'usuario',
+          entidadeId: usuarioCorrente.id,
+          descricao: `${usuarioCorrente.nome} saiu do painel administrativo.`,
+        },
+        new Date().toISOString(),
+      ),
+    );
+    sairDaEquipe();
+  };
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 md:flex-row md:px-6">
@@ -72,7 +92,7 @@ function LayoutAdmin() {
           </p>
           <button
             type="button"
-            onClick={sairDaEquipe}
+            onClick={aoSair}
             className="mt-3 flex items-center gap-2 font-display text-sm text-azul hover:underline"
           >
             <LogOut size={14} strokeWidth={1.75} aria-hidden="true" />

@@ -86,6 +86,10 @@ const casos = [
   ['cat-blockchain', c.contarPorCategoria(produtos)['cat-blockchain'], 1],
   ['cat-cripto', c.contarPorCategoria(produtos)['cat-cripto'], 1],
   ['lista vazia', c.contarPorCategoria([])['cat-ia'], undefined],
+
+  // 8. Painel administrativo
+  ['contarEsgotados', c.contarEsgotados(produtos), 1],
+  ['contarEsgotados lista vazia', c.contarEsgotados([]), 0],
 ];
 
 let falhas = 0;

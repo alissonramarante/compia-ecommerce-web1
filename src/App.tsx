@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import CarrinhoProvider from './contexts/CarrinhoContext';
 import PedidosProvider from './contexts/PedidosContext';
 import ProdutosProvider from './contexts/ProdutosContext';
+import LogsProvider from './contexts/LogsContext';
 import SessaoProvider from './contexts/SessaoContext';
 import Layout from './components/Layout';
 import LayoutAdmin from './components/LayoutAdmin';
@@ -33,93 +34,95 @@ import AdminLogs from './paginas/admin/Logs';
 function App() {
   return (
     <SessaoProvider>
-      <PedidosProvider>
-        <ProdutosProvider>
-          <CarrinhoProvider>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Inicio />} />
-                <Route path="/catalogo" element={<Catalogo />} />
-                <Route path="/produto/:slug" element={<Produto />} />
-                <Route path="/carrinho" element={<Carrinho />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/pedido/:numero" element={<Pedido />} />
-                <Route path="/conta" element={<Conta />} />
-                <Route path="/entrar" element={<Entrar />} />
+      <LogsProvider>
+        <PedidosProvider>
+          <ProdutosProvider>
+            <CarrinhoProvider>
+              <Routes>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Inicio />} />
+                  <Route path="/catalogo" element={<Catalogo />} />
+                  <Route path="/produto/:slug" element={<Produto />} />
+                  <Route path="/carrinho" element={<Carrinho />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/pedido/:numero" element={<Pedido />} />
+                  <Route path="/conta" element={<Conta />} />
+                  <Route path="/entrar" element={<Entrar />} />
 
-                <Route path="*" element={<NaoEncontrada />} />
-              </Route>
+                  <Route path="*" element={<NaoEncontrada />} />
+                </Route>
 
-              <Route
-                path="/admin"
-                element={
-                  <AreaProtegida>
-                    <LayoutAdmin />
-                  </AreaProtegida>
-                }
-              >
-                <Route index element={<AdminPainel />} />
                 <Route
-                  path="produtos"
+                  path="/admin"
                   element={
-                    <AreaProtegida area="produtos">
-                      <AdminProdutos />
+                    <AreaProtegida>
+                      <LayoutAdmin />
                     </AreaProtegida>
                   }
-                />
-                <Route
-                  path="produtos/novo"
-                  element={
-                    <AreaProtegida area="produtos" exigeEdicao>
-                      <AdminProdutoFormulario />
-                    </AreaProtegida>
-                  }
-                />
-                <Route
-                  path="produtos/:id"
-                  element={
-                    <AreaProtegida area="produtos" exigeEdicao>
-                      <AdminProdutoFormulario />
-                    </AreaProtegida>
-                  }
-                />
-                <Route
-                  path="pedidos"
-                  element={
-                    <AreaProtegida area="pedidos">
-                      <AdminPedidos />
-                    </AreaProtegida>
-                  }
-                />
-                <Route
-                  path="pedidos/:numero"
-                  element={
-                    <AreaProtegida area="pedidos">
-                      <AdminPedidoDetalhe />
-                    </AreaProtegida>
-                  }
-                />
-                <Route
-                  path="clientes"
-                  element={
-                    <AreaProtegida area="clientes">
-                      <AdminClientes />
-                    </AreaProtegida>
-                  }
-                />
-                <Route
-                  path="logs"
-                  element={
-                    <AreaProtegida area="logs">
-                      <AdminLogs />
-                    </AreaProtegida>
-                  }
-                />
-              </Route>
-            </Routes>
-          </CarrinhoProvider>
-        </ProdutosProvider>
-      </PedidosProvider>
+                >
+                  <Route index element={<AdminPainel />} />
+                  <Route
+                    path="produtos"
+                    element={
+                      <AreaProtegida area="produtos">
+                        <AdminProdutos />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="produtos/novo"
+                    element={
+                      <AreaProtegida area="produtos" exigeEdicao>
+                        <AdminProdutoFormulario />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="produtos/:id"
+                    element={
+                      <AreaProtegida area="produtos" exigeEdicao>
+                        <AdminProdutoFormulario />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="pedidos"
+                    element={
+                      <AreaProtegida area="pedidos">
+                        <AdminPedidos />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="pedidos/:numero"
+                    element={
+                      <AreaProtegida area="pedidos">
+                        <AdminPedidoDetalhe />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="clientes"
+                    element={
+                      <AreaProtegida area="clientes">
+                        <AdminClientes />
+                      </AreaProtegida>
+                    }
+                  />
+                  <Route
+                    path="logs"
+                    element={
+                      <AreaProtegida area="logs">
+                        <AdminLogs />
+                      </AreaProtegida>
+                    }
+                  />
+                </Route>
+              </Routes>
+            </CarrinhoProvider>
+          </ProdutosProvider>
+        </PedidosProvider>
+      </LogsProvider>
     </SessaoProvider>
   );
 }

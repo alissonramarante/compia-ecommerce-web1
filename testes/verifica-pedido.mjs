@@ -191,6 +191,18 @@ conferir('cli-002: 1 pedido, pago (enviado)', lib.resumoDoCliente('cli-002', ped
 conferir('cli-003: 1 pedido, ainda aguardando pagamento', lib.resumoDoCliente('cli-003', pedidos), { quantidadeDePedidos: 1, totalGasto: 0 });
 conferir('cliente sem pedido nenhum', lib.resumoDoCliente('cli-999', pedidos), { quantidadeDePedidos: 0, totalGasto: 0 });
 
+secao('contarPedidosPorStatus e receitaDosPedidosPagos');
+conferir('contarPedidosPorStatus: entregue', lib.contarPedidosPorStatus(pedidos).entregue, 1);
+conferir('contarPedidosPorStatus: enviado', lib.contarPedidosPorStatus(pedidos).enviado, 1);
+conferir('contarPedidosPorStatus: aguardando_pagamento', lib.contarPedidosPorStatus(pedidos).aguardando_pagamento, 1);
+conferir('contarPedidosPorStatus: cancelado', lib.contarPedidosPorStatus(pedidos).cancelado, 1);
+conferir('contarPedidosPorStatus: status sem pedido nenhum aparece com 0', lib.contarPedidosPorStatus(pedidos).pago, 0);
+conferir('contarPedidosPorStatus: os sete status sempre aparecem', Object.keys(lib.contarPedidosPorStatus([])).length, 7);
+conferir('contarPedidosPorStatus: lista vazia', Object.values(lib.contarPedidosPorStatus([])).every((n) => n === 0), true);
+
+conferir('receitaDosPedidosPagos: soma so os pagos (ped-001 6900 + ped-002 44900)', lib.receitaDosPedidosPagos(pedidos), 6900 + 44900);
+conferir('receitaDosPedidosPagos: lista vazia', lib.receitaDosPedidosPagos([]), 0);
+
 /* ============ 6. reducer ============ */
 secao('reducerPedidos');
 const estado = { pedidos: [pedidos[0], pedidos[1]] };
