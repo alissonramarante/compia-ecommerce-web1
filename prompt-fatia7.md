@@ -117,6 +117,19 @@ documente.
   latência.
 - `editor` não acessa esta área.
 
+### Adendo: `/admin/clientes`
+
+`permissoes.ts` já tem a área `clientes` e o `vendedor` já alcança — hoje é
+permissão sem consumidor. Esta tarefa cria a tela, **somente leitura**: nome,
+e-mail, telefone, CPF mascarado, cidade do endereço principal, quantidade de
+pedidos e total gasto nos pedidos pagos. Tudo derivado do `PedidosContext`,
+nada hardcodado. Linha clicável leva a `/admin/pedidos` filtrado pelo cliente.
+`admin` e `vendedor` veem; `editor` não. Sem formulário de edição — a spec
+pede acompanhamento, não cadastro.
+
+Se a Tarefa 2 deixar alguma referência à área `clientes` sem consumidor (por
+exemplo no menu do painel), ela fica como está até aqui.
+
 ---
 
 ## Tarefa 4 — Logs
