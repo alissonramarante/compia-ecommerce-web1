@@ -70,107 +70,109 @@ function Carrinho() {
       ) : (
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem]">
           <section>
-            <table className="w-full border-collapse">
-              <caption className="sr-only">
-                Itens no carrinho: {quantidadeTotal} no total
-              </caption>
-              <thead>
-                <tr className="border-b border-grafite/30">
-                  <th scope="col" className={CLASSE_CABECALHO_DE_COLUNA}>
-                    Título
-                  </th>
-                  <th
-                    scope="col"
-                    className={`${CLASSE_CABECALHO_DE_COLUNA} hidden md:table-cell`}
-                  >
-                    Preço
-                  </th>
-                  <th scope="col" className={CLASSE_CABECALHO_DE_COLUNA}>
-                    Quantidade
-                  </th>
-                  <th scope="col" className={`${CLASSE_CABECALHO_DE_COLUNA} text-right`}>
-                    Total
-                  </th>
-                  <th scope="col" className="pb-3">
-                    <span className="sr-only">Remover</span>
-                  </th>
-                </tr>
-              </thead>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[36rem] border-collapse">
+                <caption className="sr-only">
+                  Itens no carrinho: {quantidadeTotal} no total
+                </caption>
+                <thead>
+                  <tr className="border-b border-grafite/30">
+                    <th scope="col" className={CLASSE_CABECALHO_DE_COLUNA}>
+                      Título
+                    </th>
+                    <th
+                      scope="col"
+                      className={`${CLASSE_CABECALHO_DE_COLUNA} hidden md:table-cell`}
+                    >
+                      Preço
+                    </th>
+                    <th scope="col" className={CLASSE_CABECALHO_DE_COLUNA}>
+                      Quantidade
+                    </th>
+                    <th scope="col" className={`${CLASSE_CABECALHO_DE_COLUNA} text-right`}>
+                      Total
+                    </th>
+                    <th scope="col" className="pb-3">
+                      <span className="sr-only">Remover</span>
+                    </th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {linhas.map(({ item, produto }) => {
-                  const capa = produto.imagens[0];
-                  const ehEbook = produto.tipo === 'ebook';
+                <tbody>
+                  {linhas.map(({ item, produto }) => {
+                    const capa = produto.imagens[0];
+                    const ehEbook = produto.tipo === 'ebook';
 
-                  return (
-                    <tr key={item.produtoId} className="border-b border-grafite/20 align-top">
-                      <td className="py-4 pr-4">
-                        <div className="flex gap-3">
-                          {capa !== undefined && (
-                            <img
-                              src={capa}
-                              alt={`Capa de ${produto.titulo}, de ${produto.autores.join(', ')}`}
-                              width={48}
-                              height={68}
-                              className="h-[68px] w-12 shrink-0 border border-grafite/25 object-cover"
+                    return (
+                      <tr key={item.produtoId} className="border-b border-grafite/20 align-top">
+                        <td className="py-4 pr-4">
+                          <div className="flex gap-3">
+                            {capa !== undefined && (
+                              <img
+                                src={capa}
+                                alt={`Capa de ${produto.titulo}, de ${produto.autores.join(', ')}`}
+                                width={48}
+                                height={68}
+                                className="h-[68px] w-12 shrink-0 border border-grafite/25 object-cover"
+                              />
+                            )}
+                            <div className="min-w-0">
+                              <Link
+                                to={`/produto/${produto.slug}`}
+                                className="font-display text-sm font-bold leading-snug tracking-tight text-tinta hover:text-azul"
+                              >
+                                {produto.titulo}
+                              </Link>
+                              <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-grafite">
+                                {ehEbook ? 'E-book · entrega por download' : produto.tipo === 'kit' ? 'Kit' : 'Livro físico'}
+                              </p>
+                              {/* A coluna de preço some abaixo de 768px; aqui ele
+                                  reaparece junto do título. */}
+                              <p className="mt-1 font-mono text-xs text-grafite md:hidden">
+                                {formatarMoeda(item.precoUnitario)} cada
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="hidden py-4 pr-4 font-mono text-sm text-grafite md:table-cell">
+                          {formatarMoeda(item.precoUnitario)}
+                        </td>
+
+                        <td className="py-4 pr-4">
+                          {ehEbook ? (
+                            <span className="font-mono text-sm text-grafite">1</span>
+                          ) : (
+                            <SeletorQuantidade
+                              idDoCampo={`quantidade-${produto.id}`}
+                              descricao={produto.titulo}
+                              quantidade={item.quantidade}
+                              maximo={produto.estoque}
+                              aoMudar={(nova) => alterarQuantidade(produto, nova)}
                             />
                           )}
-                          <div className="min-w-0">
-                            <Link
-                              to={`/produto/${produto.slug}`}
-                              className="font-display text-sm font-bold leading-snug tracking-tight text-tinta hover:text-azul"
-                            >
-                              {produto.titulo}
-                            </Link>
-                            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-grafite">
-                              {ehEbook ? 'E-book · entrega por download' : produto.tipo === 'kit' ? 'Kit' : 'Livro físico'}
-                            </p>
-                            {/* A coluna de preço some abaixo de 768px; aqui ele
-                                reaparece junto do título. */}
-                            <p className="mt-1 font-mono text-xs text-grafite md:hidden">
-                              {formatarMoeda(item.precoUnitario)} cada
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      <td className="hidden py-4 pr-4 font-mono text-sm text-grafite md:table-cell">
-                        {formatarMoeda(item.precoUnitario)}
-                      </td>
+                        <td className="py-4 text-right font-mono text-sm font-medium text-tinta">
+                          {formatarMoeda(totalDaLinha(item))}
+                        </td>
 
-                      <td className="py-4 pr-4">
-                        {ehEbook ? (
-                          <span className="font-mono text-sm text-grafite">1</span>
-                        ) : (
-                          <SeletorQuantidade
-                            idDoCampo={`quantidade-${produto.id}`}
-                            descricao={produto.titulo}
-                            quantidade={item.quantidade}
-                            maximo={produto.estoque}
-                            aoMudar={(nova) => alterarQuantidade(produto, nova)}
-                          />
-                        )}
-                      </td>
-
-                      <td className="py-4 text-right font-mono text-sm font-medium text-tinta">
-                        {formatarMoeda(totalDaLinha(item))}
-                      </td>
-
-                      <td className="py-4 pl-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => remover(item.produtoId)}
-                          aria-label={`Remover ${produto.titulo} do carrinho`}
-                          className="p-2 text-grafite transition-colors hover:text-tinta"
-                        >
-                          <Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <td className="py-4 pl-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => remover(item.produtoId)}
+                            aria-label={`Remover ${produto.titulo} do carrinho`}
+                            className="p-2 text-grafite transition-colors hover:text-tinta"
+                          >
+                            <Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
             <p className="mt-6">
               <Link to="/catalogo" className="font-display text-sm text-azul hover:underline">

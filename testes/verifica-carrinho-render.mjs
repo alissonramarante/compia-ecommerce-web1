@@ -30,6 +30,7 @@ const cheio = comArmazenamento([
   { produtoId: 'prod-005', quantidade: 1, precoUnitario: 6900 },
 ]);
 caso('cheio: tabela presente', cheio.includes('<table'));
+caso('cheio: tabela rola horizontalmente em telas estreitas', cheio.includes('overflow-x-auto') && /min-w-\[\d+rem\]/.test(cheio));
 caso('cheio: título linka para o produto', cheio.includes('/produto/fundamentos-de-aprendizado-profundo'));
 caso('cheio: preço unitário em mono', cheio.includes('R$ 159,00'));
 caso('cheio: total da linha (2 x 159)', cheio.includes('R$ 318,00'));
