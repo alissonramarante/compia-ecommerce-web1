@@ -198,9 +198,23 @@ function Produtos() {
       </p>
 
       {resultado.length === 0 ? (
-        <p className="mt-4 text-sm leading-relaxed text-grafite">
-          Nenhum produto encontrado com estes filtros.
-        </p>
+        <div className="mt-4 border border-grafite/25 bg-white px-6 py-16 text-center">
+          <p className="font-display text-lg font-bold tracking-tight text-tinta">
+            {filtros.busca.trim() === ''
+              ? 'Nenhum produto com esses filtros.'
+              : `Nenhum produto para “${filtros.busca}”.`}
+          </p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-grafite">
+            Tente outro termo de busca ou um tipo diferente.
+          </p>
+          <button
+            type="button"
+            onClick={() => setParametros(new URLSearchParams())}
+            className="mt-6 border border-tinta px-5 py-2 font-display text-sm font-semibold text-tinta transition-colors hover:bg-tinta hover:text-papel"
+          >
+            Limpar filtros
+          </button>
+        </div>
       ) : (
         <div className="mt-2 overflow-x-auto">
           <table className="w-full min-w-[40rem] border-collapse">

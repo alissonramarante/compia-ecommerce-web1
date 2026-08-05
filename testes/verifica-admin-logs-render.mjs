@@ -39,7 +39,8 @@ const filtroUsuario = renderizarComProvedores('/admin/logs?usuario=usr-002', { s
 caso('filtro por usuario mostra so os dele', filtroUsuario.includes('1 registro') && filtroUsuario.includes('Cadastrou'));
 
 const semResultado = renderizarComProvedores('/admin/logs?acao=logout', { sessao: ADMIN });
-caso('sem resultado: mensagem, sem tabela', semResultado.includes('Nenhum registro encontrado') && !semResultado.includes('<table'));
+caso('sem resultado: mensagem, sem tabela', semResultado.includes('Nenhum registro com esses filtros.') && !semResultado.includes('<table'));
+caso('sem resultado: oferece limpar filtros', semResultado.includes('Limpar filtros'));
 
 /* ============ 5. só admin acessa ============ */
 secao('permissões');

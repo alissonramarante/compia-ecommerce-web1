@@ -36,7 +36,8 @@ const buscaCliente = renderizarComProvedores('/admin/pedidos?busca=larissa', { s
 caso('busca por nome do cliente', buscaCliente.includes('CPA-2026-0141') && !buscaCliente.includes('CPA-2026-0139'));
 
 const semResultado = renderizarComProvedores('/admin/pedidos?busca=zzzznada', { sessao: ADMIN });
-caso('sem resultado: mensagem, sem tabela', semResultado.includes('Nenhum pedido encontrado') && !semResultado.includes('<table'));
+caso('sem resultado: mensagem cita o termo buscado, sem tabela', semResultado.includes('Nenhum pedido para “zzzznada”.') && !semResultado.includes('<table'));
+caso('sem resultado: oferece limpar filtros', semResultado.includes('Limpar filtros'));
 
 /* ============ 4. lista: filtro por cliente (vindo de /admin/clientes) ============ */
 secao('lista — filtro por cliente');

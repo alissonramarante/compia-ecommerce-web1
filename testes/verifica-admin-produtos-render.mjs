@@ -48,7 +48,8 @@ caso('filtro por tipo ebook', filtroEbook.includes('4 produtos'));
 caso('filtro por tipo nao mostra fisico', !filtroEbook.includes('Fundamentos de Aprendizado Profundo'));
 
 const semResultado = renderizarComProvedores('/admin/produtos?busca=zzzznada', { sessao: ADMIN });
-caso('sem resultado: mensagem, sem tabela', semResultado.includes('Nenhum produto encontrado') && !semResultado.includes('<table'));
+caso('sem resultado: mensagem cita o termo buscado, sem tabela', semResultado.includes('Nenhum produto para “zzzznada”.') && !semResultado.includes('<table'));
+caso('sem resultado: oferece limpar filtros', semResultado.includes('Limpar filtros'));
 
 /* ============ 3. lista: ações por perfil ============ */
 secao('lista — ações por perfil');
