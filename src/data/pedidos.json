@@ -1,0 +1,59 @@
+[
+  {
+    "id": "COMPIA-2026-0041",
+    "data": "2026-07-28",
+    "cliente": "Ana Ribeiro",
+    "status": "entregue",
+    "pagamento": "pix",
+    "total": 219.8,
+    "itens": [
+      { "produtoId": 1, "titulo": "Introdução à Inteligência Artificial", "quantidade": 1, "valor": 89.9, "formato": "fisico" },
+      { "produtoId": 6, "titulo": "Deep Learning na Prática", "quantidade": 1, "valor": 129.9, "formato": "fisico" }
+    ]
+  },
+  {
+    "id": "COMPIA-2026-0058",
+    "data": "2026-08-02",
+    "cliente": "Ana Ribeiro",
+    "status": "enviado",
+    "pagamento": "cartao",
+    "total": 164.8,
+    "itens": [
+      { "produtoId": 3, "titulo": "Blockchain e Contratos Inteligentes", "quantidade": 1, "valor": 114.9, "formato": "fisico" },
+      { "produtoId": 8, "titulo": "Criptografia Pós-Quântica (E-book)", "quantidade": 1, "valor": 49.9, "formato": "digital" }
+    ]
+  },
+  {
+    "id": "COMPIA-2026-0063",
+    "data": "2026-08-05",
+    "cliente": "Carlos Menezes",
+    "status": "aprovado",
+    "pagamento": "pix",
+    "total": 99.8,
+    "itens": [
+      { "produtoId": 4, "titulo": "Fundamentos de Cibersegurança (E-book)", "quantidade": 2, "valor": 49.9, "formato": "digital" }
+    ]
+  },
+  {
+    "id": "COMPIA-2026-0071",
+    "data": "2026-08-06",
+    "cliente": "Instituto Nexus",
+    "status": "preparacao",
+    "pagamento": "cartao",
+    "total": 1249.0,
+    "itens": [
+      { "produtoId": 12, "titulo": "Kit Corporativo de IA Aplicada", "quantidade": 1, "valor": 1249.0, "formato": "fisico" }
+    ]
+  },
+  {
+    "id": "COMPIA-2026-0074",
+    "data": "2026-08-07",
+    "cliente": "Beatriz Lopes",
+    "status": "pendente",
+    "pagamento": "pix",
+    "total": 39.9,
+    "itens": [
+      { "produtoId": 10, "titulo": "Revista COMPIA — Edição IA Generativa", "quantidade": 1, "valor": 39.9, "formato": "digital" }
+    ]
+  }
+]

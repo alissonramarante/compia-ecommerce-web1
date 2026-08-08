@@ -1,0 +1,11 @@
+[
+  { "id": 1, "nome": "Inteligência Artificial", "slug": "inteligencia-artificial", "descricao": "Fundamentos, machine learning, deep learning e IA generativa.", "imagem": "/images/produtos/ia.jpg" },
+  { "id": 2, "nome": "Arquitetura de Software", "slug": "arquitetura-de-software", "descricao": "Sistemas distribuídos, microsserviços e arquitetura inteligente.", "imagem": "/images/produtos/arquitetura.jpg" },
+  { "id": 3, "nome": "Blockchain", "slug": "blockchain", "descricao": "Redes descentralizadas, contratos inteligentes e Web3.", "imagem": "/images/produtos/blockchain.jpg" },
+  { "id": 4, "nome": "Criptografia", "slug": "criptografia", "descricao": "Cifras modernas, chaves públicas e criptografia pós-quântica.", "imagem": "/images/produtos/criptografia.jpg" },
+  { "id": 5, "nome": "Cibersegurança", "slug": "ciberseguranca", "descricao": "Defesa, pentest, resposta a incidentes e governança.", "imagem": "/images/produtos/ciberseguranca.jpg" },
+  { "id": 6, "nome": "Educação e Tecnologia", "slug": "educacao-e-tecnologia", "descricao": "Metodologias, docência digital e materiais pedagógicos.", "imagem": "/images/produtos/educacao.jpg" },
+  { "id": 7, "nome": "Graduação", "slug": "graduacao", "descricao": "Materiais alinhados a ementas de cursos superiores.", "imagem": "/images/produtos/educacao.jpg" },
+  { "id": 8, "nome": "Pós-graduação", "slug": "pos-graduacao", "descricao": "Leituras avançadas para especialização e pesquisa.", "imagem": "/images/produtos/ia.jpg" },
+  { "id": 9, "nome": "Treinamentos Corporativos", "slug": "treinamentos-corporativos", "descricao": "Kits e trilhas para capacitação de equipes técnicas.", "imagem": "/images/produtos/arquitetura.jpg" }
+]

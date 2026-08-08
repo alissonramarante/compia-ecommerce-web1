@@ -1,0 +1,5 @@
+[
+  { "id": 1, "produtoId": 4, "titulo": "Fundamentos de Cibersegurança (E-book)", "formatoArquivo": "PDF + EPUB", "tamanho": "18,4 MB", "liberadoEm": "2026-08-05", "pedido": "COMPIA-2026-0063", "url": "/downloads/compia-ciberseguranca-demo.pdf" },
+  { "id": 2, "produtoId": 8, "titulo": "Criptografia Pós-Quântica (E-book)", "formatoArquivo": "PDF", "tamanho": "12,1 MB", "liberadoEm": "2026-08-02", "pedido": "COMPIA-2026-0058", "url": "/downloads/compia-criptografia-demo.pdf" },
+  { "id": 3, "produtoId": 10, "titulo": "Revista COMPIA — Edição IA Generativa", "formatoArquivo": "PDF", "tamanho": "8,7 MB", "liberadoEm": "2026-08-07", "pedido": "COMPIA-2026-0074", "url": "/downloads/compia-revista-demo.pdf" }
+]

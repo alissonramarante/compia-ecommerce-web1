@@ -1,0 +1,7 @@
+[
+  { "id": 1, "nome": "Ana Ribeiro", "email": "ana.ribeiro@ufpb.br", "cpf": "123.456.789-00", "cidade": "João Pessoa", "estado": "PB", "perfil": "professor", "pedidos": 4, "totalGasto": 689.5, "criadoEm": "2025-11-03" },
+  { "id": 2, "nome": "Carlos Menezes", "email": "carlos.menezes@techlab.com", "cpf": "987.654.321-00", "cidade": "São Paulo", "estado": "SP", "perfil": "profissional", "pedidos": 7, "totalGasto": 1432.7, "criadoEm": "2025-09-18" },
+  { "id": 3, "nome": "Instituto Nexus", "email": "compras@institutonexus.edu.br", "cpf": "12.345.678/0001-90", "cidade": "Recife", "estado": "PE", "perfil": "instituicao", "pedidos": 12, "totalGasto": 8920.0, "criadoEm": "2025-06-22" },
+  { "id": 4, "nome": "Beatriz Lopes", "email": "beatriz.lopes@gmail.com", "cpf": "456.123.789-11", "cidade": "Belo Horizonte", "estado": "MG", "perfil": "estudante", "pedidos": 2, "totalGasto": 179.8, "criadoEm": "2026-01-14" },
+  { "id": 5, "nome": "Rafael Souza", "email": "rafael.souza@secops.io", "cpf": "321.654.987-22", "cidade": "Curitiba", "estado": "PR", "perfil": "pesquisador", "pedidos": 5, "totalGasto": 954.3, "criadoEm": "2025-12-02" }
+]
