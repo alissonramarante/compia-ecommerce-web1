@@ -31,6 +31,16 @@ const titles: Record<string, string> = {
   "/admin/produtos": "Gestão de produtos | COMPIA",
 };
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function RouteMetadata() {
   const { pathname } = useLocation();
 
@@ -66,11 +76,14 @@ function NotFoundPage() {
   );
 }
 
+
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
       <CartProvider>
-        <BrowserRouter>
+        <ScrollToTop />
           <RouteMetadata />
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -80,15 +93,22 @@ export default function App() {
             <Route path="/carrinho" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/minha-conta" element={<AccountPage />} />
-            <Route path="/pedido/sucesso" element={<OrderSuccessPage />} />
+            <Route
+              path="/pedido/sucesso"
+              element={<OrderSuccessPage />}
+            />
             <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/produtos" element={<AdminProductsPage />} />
+            <Route
+              path="/admin/produtos"
+              element={<AdminProductsPage />}
+            />
             <Route path="/404" element={<NotFoundPage />} />
-            <Route path="*" element={<Navigate to="/404" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </BrowserRouter>
-        <Toaster richColors position="top-center" />
-      </CartProvider>
+
+          <Toaster />
+        </CartProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
