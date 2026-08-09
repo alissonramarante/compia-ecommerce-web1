@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { PixCopyButton } from "@/components/checkout/PixCopyButton";
+import { CardPaymentForm, type DadosCartao } from "@/components/checkout/CardPaymentForm";
 
 import { formatCep, formatCpf, formatCurrency } from "@/lib/format";
 
@@ -34,6 +36,9 @@ export default function Checkout() {
   const [pagamento, setPagamento] = useState<Pagamento>("pix");
 
   const [processando, setProcessando] = useState(false);
+
+  const [cartaoValido, setCartaoValido] = useState(false);
+  const [dadosCartao, setDadosCartao] = useState<DadosCartao | null>(null);
 
   const [dados, setDados] = useState({
     nome: "",
@@ -114,7 +119,9 @@ export default function Checkout() {
     dados.uf.trim().length === 2 &&
     !!shipping.selection;
 
-  const dadosOk = identificacaoOk && (!hasFisico || enderecoOk);
+  const pagamentoOk = pagamento === "pix" || cartaoValido;
+
+  const dadosOk = identificacaoOk && (!hasFisico || enderecoOk) && pagamentoOk;
 
   const enderecoFormatado = [
     `${dados.logradouro}, ${dados.numero}${dados.complemento ? ` - ${dados.complemento}` : ""}`,
@@ -158,6 +165,7 @@ export default function Checkout() {
       })),
 
       ...(hasFisico ? { endereco: enderecoFormatado } : {}),
+      ...(pagamento === "cartao" && dadosCartao ? { parcelas: dadosCartao.parcelas } : {}),
     };
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
@@ -498,31 +506,17 @@ export default function Checkout() {
                     <code className="max-w-full truncate rounded bg-background px-3 py-1 text-xs">
                       {pixPayload}
                     </code>
+
+                    <PixCopyButton payload={pixPayload} />
                   </div>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                      <Label htmlFor="cartaoNumero">Número do cartão</Label>
-
-                      <Input
-                        id="cartaoNumero"
-                        placeholder="0000 0000 0000 0000"
-                        inputMode="numeric"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="validade">Validade</Label>
-
-                      <Input id="validade" placeholder="MM/AA" />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="cvv">CVV</Label>
-
-                      <Input id="cvv" placeholder="123" inputMode="numeric" />
-                    </div>
-                  </div>
+                  <CardPaymentForm
+                    total={total}
+                    onChange={(dados, valido) => {
+                      setDadosCartao(dados);
+                      setCartaoValido(valido);
+                    }}
+                  />
                 )}
                 {!dadosOk && (
                   <p className="text-sm text-destructive">

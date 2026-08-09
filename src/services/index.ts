@@ -80,7 +80,6 @@ export const shippingService = {
   async getShippingTable(): Promise<Frete[]> {
     return fretesJson as Frete[];
   },
-  /** Simulação local de consulta de CEP (sem API externa). */
   async resolveCep(cep: string): Promise<Frete | undefined> {
     await delay(400);
     const digits = Number(cep.replace(/\D/g, ""));

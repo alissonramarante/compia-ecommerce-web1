@@ -21,7 +21,6 @@ export function useShipping() {
       const raw = window.localStorage.getItem(KEY);
       if (raw) setSelection(JSON.parse(raw) as ShippingSelection);
     } catch {
-      /* ignora */
     }
   }, []);
 

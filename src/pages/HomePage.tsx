@@ -4,11 +4,14 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { ProductGrid, ProductGridSkeleton } from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { useCategories, useProducts } from "@/hooks/useCatalog";
+import { useEffect } from "react";
+import { collection, getDocs, } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function Home() {
   const { data: produtos, isLoading } = useProducts();
   const { data: categorias } = useCategories();
-
+ 
   const destaques = (produtos ?? []).filter((p) => p.destaque).slice(0, 8);
   const tendencias = (produtos ?? []).filter((p) => p.tendencia).slice(0, 4);
 

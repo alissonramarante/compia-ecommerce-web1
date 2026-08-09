@@ -59,6 +59,7 @@ export interface Pedido {
   total: number;
   itens: PedidoItem[];
   endereco?: string;
+  parcelas?: number;
 }
 
 export interface Cliente {
