@@ -101,9 +101,7 @@ export function Header() {
             </Sheet>
           </div>
           <div className="justify-self-center md:order-1">
-            <Link to="/" aria-label="Página inicial">
-              <CompiaLogo />
-            </Link>
+            <CompiaLogo />
           </div>
           <div className="hidden flex-1 md:order-2 md:block">
             <SearchBar />

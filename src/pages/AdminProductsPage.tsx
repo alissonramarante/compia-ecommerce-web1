@@ -104,8 +104,46 @@ export default function AdminProdutos() {
             </Button>
           </div>
         </div>
+        <div className="mt-8 flex flex-col gap-3 sm:hidden">
+          {lista.map((produto) => (
+            <div key={produto.id} className="surface-card p-4">
+              <div className="flex items-start justify-between gap-3">
+                <Link
+                  to={`/produtos/${String(produto.id)}`}
+                  className="min-w-0 flex-1 truncate font-medium"
+                >
+                  {produto.titulo}
+                </Link>
+                <div className="flex shrink-0 gap-1">
+                  <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => setEditando(produto)}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Remover"
+                    className="text-destructive"
+                    onClick={() => void remover(produto.id)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
 
-        <div className="surface-card mt-8 overflow-x-auto p-0">
+              <p className="mt-1 text-sm text-muted-foreground">
+                {produto.categoria} · {produto.formato === "digital" ? "Digital" : "Físico"}
+              </p>
+
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {produto.formato === "digital" ? "—" : `${String(produto.estoque)} un. em estoque`}
+                </span>
+                <span className="tabular-nums font-semibold">{formatCurrency(produto.valor)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="surface-card mt-8 hidden overflow-x-auto p-0 sm:block">
           <Table>
             <TableHeader>
               <TableRow>
