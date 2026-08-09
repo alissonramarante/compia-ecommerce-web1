@@ -97,7 +97,7 @@ export default function Catalogo() {
                   value={filters.ordenacao}
                   onValueChange={(value) => update({ ...filters, ordenacao: value })}
                 >
-                  <SelectTrigger className="h-11 w-[190px]" aria-label="Ordenar">
+                  <SelectTrigger className="h-11 w-47.5" aria-label="Ordenar">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

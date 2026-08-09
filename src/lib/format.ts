@@ -4,7 +4,13 @@ export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
 export const formatDate = (value: string | Date) => {
-  const date = typeof value === "string" ? new Date(`${value}T12:00:00`) : value;
+  const date =
+    typeof value === "string" ? new Date(value.includes("T") ? value : `${value}T12:00:00`) : value;
+
+  if (Number.isNaN(date.getTime())) {
+    return "Data indisponível";
+  }
+
   return new Intl.DateTimeFormat("pt-BR").format(date);
 };
 

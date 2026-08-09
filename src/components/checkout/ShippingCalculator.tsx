@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,11 @@ interface Props {
 
 export function ShippingCalculator({ shipping, compact }: Props) {
   const [cep, setCep] = useState(shipping.selection?.cep ?? "");
+  useEffect(() => {
+    if (shipping.selection?.cep) {
+      setCep(shipping.selection.cep);
+    }
+  }, [shipping.selection?.cep]);
 
   return (
     <div className={compact ? "" : "surface-card p-5"}>

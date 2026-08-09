@@ -53,10 +53,12 @@ export interface Pedido {
   id: string;
   data: string;
   cliente: string;
+  email?: string;
   status: PedidoStatus;
   pagamento: "pix" | "cartao";
   total: number;
   itens: PedidoItem[];
+  endereco?: string;
 }
 
 export interface Cliente {

@@ -115,10 +115,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-y bg-brand-ink py-16 text-background">
+      <section className="bg-brand-ink py-16 text-background">
         <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 md:grid-cols-3">
           <div className="md:col-span-1">
-            <h2 className="font-display text-2xl font-bold md:text-3xl">Sobre a COMPIA</h2>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">Sobre a COMPIA</h2> 
           </div>
           <div className="space-y-4 md:col-span-2">
             <p className="text-background/75">

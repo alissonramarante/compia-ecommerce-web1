@@ -44,7 +44,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur">
       <div className="mx-auto w-full max-w-7xl px-4 py-3">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 md:gap-6">
           <div className="flex min-w-0 items-center gap-2">
@@ -125,7 +125,7 @@ export function Header() {
         </div>
       </div>
 
-      <nav className="hidden w-full border-t bg-brand-ink md:block">
+      <nav className="hidden w-full bg-brand-ink md:block">
         <div className="mx-auto flex w-[90%] items-center justify-between py-1.5">
           <Link
             to="/produtos"

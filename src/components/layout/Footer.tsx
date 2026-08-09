@@ -4,7 +4,7 @@ import categorias from "@/data/categorias.json";
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t bg-brand-ink text-background">
+    <footer className="bg-brand-ink text-background">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="inline-block rounded-lg bg-background p-3">
@@ -61,7 +61,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto w-full max-w-7xl px-4 py-6 text-xs text-background/50">
+        <p className="mx-auto w-full max-w-7xl px-4 py-6 text-xs text-background/50 align-center flex justify-center" >
           © {new Date().getFullYear()} COMPIA Editora Tech &amp; Ebooks. Demonstração com dados
           fictícios — nenhum pagamento é processado.
         </p>
