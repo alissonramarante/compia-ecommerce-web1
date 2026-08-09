@@ -63,8 +63,6 @@ export default function Checkout() {
     setDados((prev) => ({ ...prev, cep: formatted }));
 
     if (formatted.replace(/\D/g, "").length !== 8) return;
-
-    // Calcula o frete (tabela local) e busca o endereço (ViaCEP) em paralelo.
     const [, endereco] = await Promise.all([
       shipping.calcular(formatted),
       addressLookup.buscar(formatted),
@@ -80,15 +78,10 @@ export default function Checkout() {
       }));
     }
   };
-
-  // Se o usuário já informou o CEP no carrinho (shipping.selection persistido),
-  // reaproveita esse CEP no checkout em vez de pedir de novo — pré-preenche
-  // frete + endereço assim que o valor salvo estiver disponível.
   useEffect(() => {
     if (hasFisico && shipping.selection?.cep && !dados.cep) {
       void handleCepChange(shipping.selection.cep);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasFisico, shipping.selection?.cep]);
 
   if (items.length === 0) {

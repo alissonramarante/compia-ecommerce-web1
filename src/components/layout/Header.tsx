@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, ShoppingCart, User } from "lucide-react";
+import { Settings, Menu, Search, ShoppingCart, User } from "lucide-react";
 import { CompiaLogo } from "@/components/branding/CompiaLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+
 import { useCart } from "@/store/cart";
 import categorias from "@/data/categorias.json";
 
@@ -12,18 +13,19 @@ function SearchBar({ onDone }: { onDone?: () => void }) {
   const navigate = useNavigate();
   const [term, setTerm] = useState("");
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    navigate(term ? `/produtos?q=${encodeURIComponent(term)}` : "/produtos");
+
+    onDone?.();
+  }
+
   return (
-    <form
-      role="search"
-      className="flex w-full items-center gap-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        navigate(term ? `/produtos?q=${encodeURIComponent(term)}` : "/produtos");
-        onDone?.();
-      }}
-    >
-      <div className="relative w-full min-w-0">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <form role="search" className="flex w-full items-center gap-2" onSubmit={handleSubmit}>
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+
         <Input
           value={term}
           onChange={(e) => setTerm(e.target.value)}
@@ -32,7 +34,8 @@ function SearchBar({ onDone }: { onDone?: () => void }) {
           className="h-11 pl-9"
         />
       </div>
-      <Button type="submit" className="h-11 shrink-0">
+
+      <Button type="submit" className="h-11">
         Buscar
       </Button>
     </form>
@@ -44,20 +47,21 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur">
-      <div className="mx-auto w-full max-w-7xl px-4 py-3">
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 md:gap-6">
-          <div className="flex min-w-0 items-center gap-2">
+    <header className="w-full border-b bg-background">
+      <div className="mx-auto w-[90%]">
+        <div className="grid grid-cols-3 items-center py-3 md:flex md:gap-6">
+          <div className="justify-self-start md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Abrir menu">
+                <Button variant="ghost" size="icon" aria-label="Abrir menu">
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80 p-6">
-                <SheetTitle className="sr-only">Menu de categorias</SheetTitle>
-                <CompiaLogo className="h-12" />
-                <nav className="mt-6 flex flex-col gap-1">
+
+              <SheetContent side="left">
+                <SheetTitle>Menu de categorias</SheetTitle>
+
+                <div className="mt-6 flex flex-col gap-1">
                   <Link
                     to="/produtos"
                     onClick={() => setOpen(false)}
@@ -65,6 +69,7 @@ export function Header() {
                   >
                     Todos os produtos
                   </Link>
+
                   {categorias.map((c) => (
                     <Link
                       key={c.id}
@@ -75,6 +80,7 @@ export function Header() {
                       {c.nome}
                     </Link>
                   ))}
+
                   <Link
                     to="/minha-conta"
                     onClick={() => setOpen(false)}
@@ -82,6 +88,7 @@ export function Header() {
                   >
                     Minha conta
                   </Link>
+
                   <Link
                     to="/admin"
                     onClick={() => setOpen(false)}
@@ -89,17 +96,19 @@ export function Header() {
                   >
                     Painel administrativo
                   </Link>
-                </nav>
+                </div>
               </SheetContent>
             </Sheet>
-            <CompiaLogo className="h-9 md:h-12" priority />
           </div>
-
-          <div className="hidden md:block">
+          <div className="justify-self-center md:order-1">
+            <Link to="/" aria-label="Página inicial">
+              <CompiaLogo />
+            </Link>
+          </div>
+          <div className="hidden flex-1 md:order-2 md:block">
             <SearchBar />
           </div>
-
-          <div className="flex items-center gap-1">
+          <div className="flex items-center justify-self-end gap-1 md:order-3">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
               <Link to="/minha-conta">
                 <User className="size-4" />
@@ -109,7 +118,9 @@ export function Header() {
             <Button variant="ghost" asChild className="relative">
               <Link to="/carrinho" aria-label={`Carrinho com ${totalItems} itens`}>
                 <ShoppingCart className="size-5" />
+
                 <span className="hidden lg:inline">Carrinho</span>
+
                 {totalItems > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 grid size-5 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
                     {totalItems}
@@ -117,14 +128,18 @@ export function Header() {
                 )}
               </Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/admin" aria-label="Painel administrativo">
+                <Settings className="size-5" />
+                <span className="hidden lg:inline">Administração</span>
+              </Link>
+            </Button>
           </div>
         </div>
-
-        <div className="mt-3 md:hidden">
+        <div className="pb-3 md:hidden">
           <SearchBar />
         </div>
       </div>
-
       <nav className="hidden w-full bg-brand-ink md:block">
         <div className="mx-auto flex w-[90%] items-center justify-between py-1.5">
           <Link
@@ -133,6 +148,7 @@ export function Header() {
           >
             Todos os produtos
           </Link>
+
           {categorias.map((c) => (
             <Link
               key={c.id}

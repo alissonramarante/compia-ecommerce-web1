@@ -25,8 +25,8 @@ export function ShippingCalculator({ shipping, compact }: Props) {
         <Truck className="size-4 text-primary" />
         <h3 className="font-display text-sm font-semibold">Calcular frete</h3>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Simulação local de CEP — nenhuma API externa é consultada.
+      <p className="mt-1 text-xs text-muted-foreground align-center">
+        Informe o CEP para calcular o valor do frete.
       </p>
 
       <form

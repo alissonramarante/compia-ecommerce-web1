@@ -6,12 +6,12 @@ export function Footer() {
   return (
     <footer className="bg-brand-ink text-background">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 md:grid-cols-4">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 align-center flex flex-col items-center justify-center text-center md:items-start md:text-left">
           <div className="inline-block rounded-lg bg-background p-3">
             <CompiaLogo className="h-14" />
           </div>
           <p className="mt-4 max-w-sm text-sm text-background/70">
-            COMPIA — Conhecimento, tecnologia e inovação para a próxima geração.
+            CompIA — Conhecimento, tecnologia e inovação para a próxima geração.
           </p>
         </div>
 
