@@ -47,7 +47,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="w-full border-b bg-background">
+    <header className="w-full border-b bg-background print:hidden">
       <div className="mx-auto w-[90%]">
         <div className="grid grid-cols-3 items-center py-3 md:flex md:gap-6">
           <div className="justify-self-start md:hidden">

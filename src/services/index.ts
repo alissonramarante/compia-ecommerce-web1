@@ -89,25 +89,70 @@ export const shippingService = {
   },
 };
 
+const PEDIDOS_KEY = "compia:pedidos";
+const PEDIDOS_STATUS_KEY = "compia:pedidosStatus";
+
+function readStatusOverrides(): Record<string, Pedido["status"]> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(PEDIDOS_STATUS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, Pedido["status"]>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeStatusOverrides(overrides: Record<string, Pedido["status"]>) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(PEDIDOS_STATUS_KEY, JSON.stringify(overrides));
+}
+
 export const orderService = {
   async getOrders(): Promise<Pedido[]> {
     await delay(80);
     const local = typeof window !== "undefined"
-      ? window.localStorage.getItem("compia:pedidos")
+      ? window.localStorage.getItem(PEDIDOS_KEY)
       : null;
     const criados = local ? (JSON.parse(local) as Pedido[]) : [];
-    return [...criados, ...(pedidosJson as Pedido[])];
+    const todos = [...criados, ...(pedidosJson as Pedido[])];
+
+    const statusOverrides = readStatusOverrides();
+    if (Object.keys(statusOverrides).length === 0) return todos;
+
+    return todos.map((pedido) =>
+      statusOverrides[pedido.id] ? { ...pedido, status: statusOverrides[pedido.id] } : pedido,
+    );
+  },
+  async getOrder(id: string): Promise<Pedido | undefined> {
+    const pedidos = await orderService.getOrders();
+    return pedidos.find((p) => p.id === id);
   },
   async createOrder(pedido: Pedido): Promise<Pedido> {
     if (typeof window !== "undefined") {
-      const local = window.localStorage.getItem("compia:pedidos");
+      const local = window.localStorage.getItem(PEDIDOS_KEY);
       const criados = local ? (JSON.parse(local) as Pedido[]) : [];
       window.localStorage.setItem(
-        "compia:pedidos",
+        PEDIDOS_KEY,
         JSON.stringify([pedido, ...criados].slice(0, 20)),
       );
     }
     return pedido;
+  },
+  async updateOrderStatus(id: string, status: Pedido["status"]): Promise<Pedido | undefined> {
+    if (typeof window !== "undefined") {
+      const local = window.localStorage.getItem(PEDIDOS_KEY);
+      const criados = local ? (JSON.parse(local) as Pedido[]) : [];
+      const index = criados.findIndex((p) => p.id === id);
+      if (index >= 0) {
+        criados[index] = { ...criados[index], status };
+        window.localStorage.setItem(PEDIDOS_KEY, JSON.stringify(criados));
+      }
+    }
+    const overrides = readStatusOverrides();
+    overrides[id] = status;
+    writeStatusOverrides(overrides);
+
+    return orderService.getOrder(id);
   },
 };
 

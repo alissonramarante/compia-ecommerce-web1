@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BarChart3, Boxes, ShoppingBag, Users } from "lucide-react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -18,6 +18,7 @@ import { formatCurrency, formatDate, getDisponibilidade } from "@/lib/format";
 import { useCustomers, useOrders, useProducts } from "@/hooks/useCatalog";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { data: produtos } = useProducts();
   const { data: pedidos } = useOrders();
   const { data: clientes } = useCustomers();
@@ -31,7 +32,7 @@ export default function AdminDashboard() {
 
   const cards = [
     {
-      label: "Receita simulada",
+      label: "Total de vendas",
       valor: formatCurrency(receita),
       Icon: BarChart3,
     },
@@ -39,11 +40,13 @@ export default function AdminDashboard() {
       label: "Pedidos",
       valor: String(listaPedidos.length),
       Icon: ShoppingBag,
+      to: "/admin/pedidos",
     },
     {
-      label: "Produtos ativos",
+      label: "Produtos",
       valor: String(lista.length),
       Icon: Boxes,
+      to: "/admin/produtos",
     },
     {
       label: "Clientes",
@@ -64,29 +67,63 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <Button asChild className="w-full sm:w-auto">
-            <Link to="/admin/produtos">Gerenciar produtos</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="w-full sm:w-auto">
+              <Link to="/admin/produtos">Gerenciar produtos</Link>
+            </Button>
+          </div>
         </div>
         <div className="mt-8 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map(({ label, valor, Icon }) => (
-            <div key={label} className="surface-card w-full p-5">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-muted-foreground">{label}</span>
+          {cards.map(({ label, valor, Icon, to }) => {
+            const card = (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">{label}</span>
 
-                <Icon className="size-4 shrink-0 text-primary" />
+                  <Icon className="size-5 text-primary" />
+                </div>
+
+                <p className="mt-4 font-display text-2xl font-bold">{valor}</p>
+              </>
+            );
+
+            if (to) {
+              return (
+                <Link
+                  key={label}
+                  to={to}
+                  className="surface-card block p-5 transition-shadow hover:shadow-elevated"
+                >
+                  {card}
+                </Link>
+              );
+            }
+
+            return (
+              <div key={label} className="surface-card p-5">
+                {card}
               </div>
-
-              <p className="mt-3 font-display text-2xl font-bold tabular-nums">{valor}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="mt-10 grid w-full min-w-0 gap-8 lg:grid-cols-2">
           <section className="w-full min-w-0">
-            <h2 className="font-display text-lg font-semibold">Pedidos recentes</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-lg font-semibold">Pedidos recentes</h2>
+              <Link
+                to="/admin/pedidos"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Ver todos
+              </Link>
+            </div>
             <div className="mt-4 flex w-full flex-col gap-3 sm:hidden">
               {listaPedidos.slice(0, 8).map((pedido) => (
-                <div key={pedido.id} className="surface-card w-full p-4">
+                <Link
+                  key={pedido.id}
+                  to={`/admin/pedidos/${pedido.id}`}
+                  className="surface-card block w-full p-4"
+                >
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 truncate font-medium">{pedido.id}</span>
 
@@ -104,7 +141,7 @@ export default function AdminDashboard() {
                       {formatCurrency(pedido.total)}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
             <div className="surface-card mt-4 hidden w-full min-w-0 overflow-x-auto p-0 sm:block">
@@ -121,7 +158,11 @@ export default function AdminDashboard() {
 
                 <TableBody>
                   {listaPedidos.slice(0, 8).map((pedido) => (
-                    <TableRow key={pedido.id}>
+                    <TableRow
+                      key={pedido.id}
+                      className="cursor-pointer"
+                      onClick={() => navigate(`/admin/pedidos/${pedido.id}`)}
+                    >
                       <TableCell className="font-medium">{pedido.id}</TableCell>
 
                       <TableCell>{pedido.cliente}</TableCell>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,7 @@ const vazio = (id: number): Produto => ({
 });
 
 export default function AdminProdutos() {
+  const navigate = useNavigate();
   const { data: produtos } = useProducts();
   const { data: categorias } = useCategories();
   const queryClient = useQueryClient();
@@ -81,6 +82,10 @@ export default function AdminProdutos() {
   return (
     <SiteLayout>
       <div className="mx-auto w-full max-w-7xl px-4 py-10">
+        <Button variant="ghost" className="mb-4 -ml-2" onClick={() => navigate("/admin")}>
+          <ArrowLeft className="size-4" />
+          Painel administrativo
+        </Button>
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
             <h1 className="font-display text-3xl font-bold">Produtos</h1>
@@ -89,16 +94,6 @@ export default function AdminProdutos() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              onClick={async () => {
-                await productService.resetProducts();
-                await refresh();
-                toast.success("Catálogo restaurado.");
-              }}
-            >
-              <RotateCcw className="size-4" /> Restaurar
-            </Button>
             <Button onClick={() => setEditando(vazio(productService.nextId(lista)))}>
               <Plus className="size-4" /> Novo produto
             </Button>
@@ -115,7 +110,12 @@ export default function AdminProdutos() {
                   {produto.titulo}
                 </Link>
                 <div className="flex shrink-0 gap-1">
-                  <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => setEditando(produto)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Editar"
+                    onClick={() => setEditando(produto)}
+                  >
                     <Pencil className="size-4" />
                   </Button>
                   <Button
@@ -136,7 +136,9 @@ export default function AdminProdutos() {
 
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {produto.formato === "digital" ? "—" : `${String(produto.estoque)} un. em estoque`}
+                  {produto.formato === "digital"
+                    ? "—"
+                    : `${String(produto.estoque)} un. em estoque`}
                 </span>
                 <span className="tabular-nums font-semibold">{formatCurrency(produto.valor)}</span>
               </div>
@@ -158,10 +160,8 @@ export default function AdminProdutos() {
             <TableBody>
               {lista.map((produto) => (
                 <TableRow key={produto.id}>
-                  <TableCell className="max-w-[280px] truncate font-medium">
-                    <Link to={`/produtos/${String(produto.id)}`}>
-                      {produto.titulo}
-                    </Link>
+                  <TableCell className="max-w-70 truncate font-medium">
+                    <Link to={`/produtos/${String(produto.id)}`}>{produto.titulo}</Link>
                   </TableCell>
                   <TableCell>{produto.categoria}</TableCell>
                   <TableCell>{produto.formato === "digital" ? "Digital" : "Físico"}</TableCell>
@@ -172,7 +172,12 @@ export default function AdminProdutos() {
                     {formatCurrency(produto.valor)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => setEditando(produto)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Editar"
+                      onClick={() => setEditando(produto)}
+                    >
                       <Pencil className="size-4" />
                     </Button>
                     <Button

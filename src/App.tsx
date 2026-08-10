@@ -13,6 +13,8 @@ import AccountPage from "@/pages/AccountPage";
 import OrderSuccessPage from "@/pages/OrderSuccessPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import AdminProductsPage from "@/pages/AdminProductsPage";
+import AdminOrdersPage from "@/pages/AdminOrdersPage";
+import AdminOrderDetailPage from "@/pages/AdminOrderDetailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +31,7 @@ const titles: Record<string, string> = {
   "/pedido/sucesso": "Pedido confirmado | COMPIA",
   "/admin": "Painel administrativo | COMPIA",
   "/admin/produtos": "Gestão de produtos | COMPIA",
+  "/admin/pedidos": "Pedidos | COMPIA",
 };
 
 function ScrollToTop() {
@@ -48,6 +51,7 @@ function RouteMetadata() {
     const title = titles[pathname]
       ?? (pathname.startsWith("/categoria/") ? "Categoria | COMPIA" : undefined)
       ?? (pathname.startsWith("/produtos/") ? "Produto | COMPIA" : undefined)
+      ?? (pathname.startsWith("/admin/pedidos/") ? "Detalhes do pedido | COMPIA" : undefined)
       ?? "CompIA";
 
     document.title = title;
@@ -96,6 +100,8 @@ export default function App() {
             <Route path="/pedido/sucesso" element={<OrderSuccessPage />} />
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/produtos" element={<AdminProductsPage />}/>
+            <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
+            <Route path="/admin/pedidos/:id" element={<AdminOrderDetailPage />} />
             <Route path="/404" element={<NotFoundPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

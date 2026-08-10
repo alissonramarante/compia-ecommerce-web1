@@ -4,7 +4,7 @@ import categorias from "@/data/categorias.json";
 
 export function Footer() {
   return (
-    <footer className="bg-brand-ink text-background">
+    <footer className="bg-brand-ink text-background print:hidden">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 md:grid-cols-4">
         <div className="md:col-span-2 align-center flex flex-col items-center justify-center text-center md:items-start md:text-left">
           <div className="inline-block rounded-lg bg-background p-3">

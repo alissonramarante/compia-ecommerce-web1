@@ -8,6 +8,7 @@ import {
   shippingService,
 } from "@/services";
 
+
 export const useProducts = () =>
   useQuery({ queryKey: ["produtos"], queryFn: productService.getProducts });
 
@@ -16,6 +17,13 @@ export const useCategories = () =>
 
 export const useOrders = () =>
   useQuery({ queryKey: ["pedidos"], queryFn: orderService.getOrders });
+
+export const useOrder = (id: string | undefined) =>
+  useQuery({
+    queryKey: ["pedido", id],
+    queryFn: () => orderService.getOrder(id as string),
+    enabled: !!id,
+  });
 
 export const useCustomers = () =>
   useQuery({ queryKey: ["clientes"], queryFn: customerService.getCustomers });
